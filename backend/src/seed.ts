@@ -19,7 +19,7 @@ const seedData = async () => {
     // Create users
     console.log('👥 Creating users...');
     
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    const adminPassword = await bcrypt.hash('Admin123@', 10);
     const customerPassword = await bcrypt.hash('customer123', 10);
 
     const admin = await User.create({
@@ -41,7 +41,7 @@ const seedData = async () => {
     });
 
     console.log('✅ Users created:');
-    console.log('   Admin: admin@xetot.com / admin123');
+    console.log('   Admin: admin@xetot.com / Admin123@');
     console.log('   Customer: customer@example.com / customer123');
 
     // Create sample cars
@@ -250,7 +250,7 @@ const seedData = async () => {
     console.log(`✅ Created ${cars.length} sample cars`);
     console.log('\n🎉 Seed data completed successfully!');
     console.log('\n📝 Summary:');
-    console.log(`   - Admin user: admin@xetot.com / admin123`);
+    console.log(`   - Admin user: admin@xetot.com / Admin123@`);
     console.log(`   - Customer user: customer@example.com / customer123`);
     console.log(`   - Cars: ${cars.length} vehicles`);
     

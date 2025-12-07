@@ -3,8 +3,10 @@ import { Shield, Upload, X, CheckCircle, XCircle, Clock, AlertCircle } from 'luc
 import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import xacThucService, { XacThuc } from '../../services/xacThucService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const XacThucTaiKhoan: React.FC = () => {
+  const { refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [xacThuc, setXacThuc] = useState<XacThuc | null>(null);
@@ -70,7 +72,9 @@ const XacThucTaiKhoan: React.FC = () => {
 
       const response = await xacThucService.upload(formData);
       alert(response.message);
-      fetchStatus();
+      await fetchStatus();
+      // Refresh user data để cập nhật trạng thái xác thực
+      await refreshUser();
     } catch (error: any) {
       alert(error.response?.data?.message || 'Có lỗi xảy ra');
     } finally {

@@ -3,6 +3,7 @@
 ## Công nghệ sử dụng
 
 - React 19 với TypeScript
+- Vite cho build tool và dev server
 - Tailwind CSS cho styling
 - Framer Motion cho animations
 - React Router DOM cho routing
@@ -16,11 +17,29 @@ npm install
 
 ## Chạy ứng dụng
 
+### Development
 ```bash
-npm start
+npm run dev
 ```
 
 Ứng dụng sẽ chạy tại http://localhost:3000
+
+### Build cho production
+```bash
+npm run build
+```
+
+### Preview build
+```bash
+npm run preview
+```
+
+## Biến môi trường
+
+Tạo file `.env` trong thư mục `frontend` với nội dung:
+```
+VITE_API_URL=http://localhost:5000
+```
 
 ## Cấu trúc thư mục
 

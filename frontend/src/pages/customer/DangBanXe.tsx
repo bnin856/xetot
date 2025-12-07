@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const DangBanXe: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [daXacThuc, setDaXacThuc] = useState<boolean | null>(null);
   const [hinhAnhFiles, setHinhAnhFiles] = useState<File[]>([]);
@@ -24,6 +24,17 @@ const DangBanXe: React.FC = () => {
     tinhTrangXe: 'xeCu' as 'xeMoi' | 'xeCu',
     moTa: '',
   });
+
+  useEffect(() => {
+    const checkXacThuc = async () => {
+      if (user) {
+        // Refresh user data để đảm bảo có thông tin xác thực mới nhất
+        await refreshUser();
+      }
+    };
+    checkXacThuc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (user) {

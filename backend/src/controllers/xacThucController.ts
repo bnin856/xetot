@@ -49,11 +49,44 @@ export const uploadXacThuc = async (
       trangThai: 'choXuLy',
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Gửi yêu cầu xác thực thành công. Chờ admin duyệt.',
-      data: { xacThuc },
-    });
+    // Tự động duyệt ngay lập tức (để demo/thuyết trình)
+    // Có thể tắt bằng cách set AUTO_APPROVE_KYC=false trong .env
+    const autoApprove = process.env.AUTO_APPROVE_KYC !== 'false'; // Mặc định là true
+    if (autoApprove) {
+      // Tự động duyệt
+      xacThuc.trangThai = 'daDuyet';
+      xacThuc.ngayXuLy = new Date();
+      // Không có nguoiXuLy vì là auto approve
+      await xacThuc.save();
+
+      // Cập nhật user
+      const user = await User.findById(userId);
+      if (user) {
+        user.xacThuc = {
+          daXacThuc: true,
+          ngayXacThuc: new Date(),
+          loaiXacThuc: [loaiGiayTo],
+        };
+        
+        if (hinhAnhGiayToXe.length > 0) {
+          user.xacThuc.loaiXacThuc.push('giayToXe');
+        }
+        
+        await user.save();
+      }
+
+      res.status(201).json({
+        success: true,
+        message: 'Xác thực đã được tự động duyệt thành công.',
+        data: { xacThuc },
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: 'Gửi yêu cầu xác thực thành công. Chờ admin duyệt.',
+        data: { xacThuc },
+      });
+    }
   } catch (error) {
     next(error);
   }

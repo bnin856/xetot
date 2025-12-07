@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Car, ShoppingCart, Users, CreditCard, 
   BarChart3, Bell, HelpCircle, Star, Tag, DollarSign, 
-  FileText, LogOut, Menu, X
+  FileText, LogOut, Menu, X, Shield
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -24,6 +24,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { path: '/admin/don-hang', icon: ShoppingCart, label: 'Quản lý đơn hàng', id: 'donHang' },
     { path: '/admin/tranh-chap', icon: CreditCard, label: 'Xử lý tranh chấp', id: 'tranhChap' },
     { path: '/admin/khach-hang', icon: Users, label: 'Quản lý khách hàng', id: 'khachHang' },
+    { path: '/admin/xac-thuc', icon: Shield, label: 'Quản lý xác thực KYC', id: 'xacThuc' },
     { path: '/admin/thanh-toan', icon: CreditCard, label: 'Quản lý thanh toán', id: 'thanhToan' },
     { path: '/admin/bao-cao', icon: BarChart3, label: 'Báo cáo', id: 'baoCao' },
     { path: '/admin/thong-bao', icon: Bell, label: 'Quản lý thông báo', id: 'thongBao' },

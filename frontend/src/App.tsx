@@ -45,6 +45,7 @@ import TongQuan from './pages/admin/TongQuan';
 import QuanLyXe from './pages/admin/QuanLyXe';
 import QuanLyDonHang from './pages/admin/QuanLyDonHang';
 import QuanLyKhachHang from './pages/admin/QuanLyKhachHang';
+import QuanLyXacThuc from './pages/admin/QuanLyXacThuc';
 
 function App() {
   return (
@@ -242,6 +243,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin>
                 <QuanLyKhachHang />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/xac-thuc"
+            element={
+              <ProtectedRoute requireAdmin>
+                <QuanLyXacThuc />
               </ProtectedRoute>
             }
           />

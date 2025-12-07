@@ -27,6 +27,7 @@ cp .env.example .env
 - `MONGODB_URI`: Đường dẫn kết nối MongoDB
 - `JWT_SECRET`: Secret key cho JWT
 - `PORT`: Port cho server (mặc định 5000)
+- `AUTO_APPROVE_KYC`: Tự động duyệt KYC (true/false, mặc định false) - Xem thêm `KYC_AUTO_APPROVE.md`
 
 4. Đảm bảo MongoDB đang chạy
 

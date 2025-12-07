@@ -37,6 +37,7 @@ export const getAllXeChoThue = async (
 
     const [xe, total] = await Promise.all([
       XeChoThue.find(query)
+        .populate('idChuXe', 'ten email sdt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum),

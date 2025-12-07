@@ -50,8 +50,7 @@ const walletSchema = new Schema<IWallet>(
   }
 );
 
-// Index cho tìm kiếm nhanh
-walletSchema.index({ idNguoiDung: 1 });
+// idNguoiDung đã có unique: true nên không cần index riêng
 
 export default mongoose.model<IWallet>('Wallet', walletSchema);
 

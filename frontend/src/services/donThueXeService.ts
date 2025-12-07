@@ -47,6 +47,12 @@ const donThueXeService = {
     return response.data;
   },
 
+  // Lấy tất cả đơn thuê xe (Admin only)
+  getAll: async (): Promise<{ success: boolean; data: DonThueXe[] }> => {
+    const response = await api.get('/don-thue-xe');
+    return response.data;
+  },
+
   // Lấy đơn thuê xe theo ID
   getDonThueXeById: async (id: string): Promise<DonThueXe> => {
     const response = await api.get(`/don-thue-xe/${id}`);

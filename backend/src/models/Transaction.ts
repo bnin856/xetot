@@ -92,7 +92,7 @@ const transactionSchema = new Schema<ITransaction>(
 // Indexes
 transactionSchema.index({ idNguoiDung: 1, createdAt: -1 });
 transactionSchema.index({ idVi: 1, createdAt: -1 });
-transactionSchema.index({ maGiaoDich: 1 });
+// maGiaoDich đã có unique: true nên không cần index riêng
 
 export default mongoose.model<ITransaction>('Transaction', transactionSchema);
 

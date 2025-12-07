@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, User, LogOut, Menu, Heart, MessageCircle, Calendar } from 'lucide-react';
+import { User, LogOut, Menu, Heart, MessageCircle, Calendar } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -48,11 +48,6 @@ const Header: React.FC = () => {
                 >
                   <Calendar className="w-6 h-6 text-gray-600" />
                 </Link>
-
-                <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <Bell className="w-6 h-6 text-gray-600" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
                 
                 <div className="relative">
                   <button

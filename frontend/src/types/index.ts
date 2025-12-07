@@ -28,6 +28,8 @@ export interface Xe {
   moTa: string;
   hinhAnh: string[];
   ngayDang: string;
+  createdAt?: string;
+  updatedAt?: string;
   idChuXe?: string | { _id: string; ten?: string; email?: string; sdt?: string };
   hoaHong?: number;
 }

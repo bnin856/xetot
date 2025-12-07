@@ -23,7 +23,7 @@ const seedFullData = async () => {
     // Create users
     console.log('👥 Creating users...');
     
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    const adminPassword = await bcrypt.hash('Admin123@', 10);
     const customerPassword = await bcrypt.hash('customer123', 10);
 
     await User.create([
@@ -302,7 +302,7 @@ const seedFullData = async () => {
     console.log(`   - Cars for rent: ${xeChoThue.length}`);
     console.log(`   - Services: ${dichVu.length}\n`);
     console.log('🔐 Login credentials:');
-    console.log('   Admin: admin@xetot.com / admin123');
+    console.log('   Admin: admin@xetot.com / Admin123@');
     console.log('   Customer: customer@example.com / customer123');
 
     process.exit(0);

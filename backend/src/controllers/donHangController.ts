@@ -160,7 +160,7 @@ export const getAllDonHang = async (
     const limitNum = parseInt(limit as string);
     const skip = (pageNum - 1) * limitNum;
 
-    const [donHang, total] = await Promise.all([
+    const [donHangList, total] = await Promise.all([
       DonHang.find(query)
         .populate('idKhachHang', 'ten email sdt')
         .populate('idXe')
@@ -169,6 +169,15 @@ export const getAllDonHang = async (
         .limit(limitNum),
       DonHang.countDocuments(query),
     ]);
+
+    // Transform _id to id for frontend
+    const donHang = donHangList.map((item: any) => {
+      const obj = item.toObject();
+      return {
+        ...obj,
+        id: obj._id?.toString() || '',
+      };
+    });
 
     res.json({
       success: true,

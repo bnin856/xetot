@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Edit, Trash2, Search } from 'lucide-react';
+import { Edit, Trash2, Search, Eye, X, Shield, CheckCircle, XCircle } from 'lucide-react';
 import AdminLayout from '../../components/Layout/AdminLayout';
 import { motion } from 'framer-motion';
 import { khachHangService } from '../../services/khachHangService';
@@ -9,16 +9,20 @@ const QuanLyKhachHang: React.FC = () => {
   const [khachHang, setKhachHang] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedKhachHang, setSelectedKhachHang] = useState<User | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     const fetchKhachHang = async () => {
       try {
-        const response = await khachHangService.getAll({ limit: 100, search: searchTerm });
+        setLoading(true);
+        const response = await khachHangService.getAll({ limit: 100, search: searchTerm || undefined });
         if (response.success) {
           setKhachHang(response.data.khachHang);
         }
       } catch (error) {
         console.error('Error fetching khach hang:', error);
+        alert('Có lỗi xảy ra khi tải danh sách khách hàng');
       } finally {
         setLoading(false);
       }
@@ -26,6 +30,18 @@ const QuanLyKhachHang: React.FC = () => {
 
     fetchKhachHang();
   }, [searchTerm]);
+
+  const handleViewDetail = async (id: string) => {
+    try {
+      const response = await khachHangService.getById(id);
+      if (response.success) {
+        setSelectedKhachHang(response.data.user);
+        setShowDetailModal(true);
+      }
+    } catch (error) {
+      alert('Có lỗi xảy ra khi tải thông tin khách hàng');
+    }
+  };
 
   return (
     <AdminLayout>
@@ -86,11 +102,12 @@ const QuanLyKhachHang: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm">-</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded">
-                          <Trash2 className="w-4 h-4" />
+                        <button 
+                          onClick={() => handleViewDetail(kh.id)}
+                          className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded"
+                          title="Xem chi tiết"
+                        >
+                          <Eye className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -101,6 +118,126 @@ const QuanLyKhachHang: React.FC = () => {
             </table>
           </div>
         </div>
+
+        {/* Detail Modal */}
+        {showDetailModal && selectedKhachHang && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Chi tiết khách hàng</h2>
+                <button
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    setSelectedKhachHang(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Thông tin cơ bản */}
+                <div>
+                  <h3 className="font-semibold text-lg mb-4">Thông tin cơ bản</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Họ và tên</p>
+                        <p className="font-medium">{selectedKhachHang.ten}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="font-medium">{selectedKhachHang.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Số điện thoại</p>
+                        <p className="font-medium">{selectedKhachHang.sdt || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Địa chỉ</p>
+                        <p className="font-medium">{selectedKhachHang.diaChi || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trạng thái xác thực */}
+                <div>
+                  <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Trạng thái xác thực
+                  </h3>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    {selectedKhachHang.xacThuc?.daXacThuc ? (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-medium">Đã xác thực</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-yellow-600">
+                        <XCircle className="w-5 h-5" />
+                        <span className="font-medium">Chưa xác thực</span>
+                      </div>
+                    )}
+                    {selectedKhachHang.xacThuc?.ngayXacThuc && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        Ngày xác thực: {new Date(selectedKhachHang.xacThuc.ngayXacThuc).toLocaleDateString('vi-VN')}
+                      </p>
+                    )}
+                    {selectedKhachHang.xacThuc?.loaiXacThuc && selectedKhachHang.xacThuc.loaiXacThuc.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500 mb-1">Loại xác thực:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedKhachHang.xacThuc.loaiXacThuc.map((loai, index) => (
+                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                              {loai === 'cmnd' ? 'CMND' : loai === 'cccd' ? 'CCCD' : 'Giấy tờ xe'}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Vai trò */}
+                <div>
+                  <h3 className="font-semibold text-lg mb-4">Vai trò</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm font-medium">
+                        {selectedKhachHang.vaiTro === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
+                      </span>
+                      {selectedKhachHang.vaiTroPhu && selectedKhachHang.vaiTroPhu.length > 0 && (
+                        <>
+                          {selectedKhachHang.vaiTroPhu.includes('nguoiBan') && (
+                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                              Người bán
+                            </span>
+                          )}
+                          {selectedKhachHang.vaiTroPhu.includes('nguoiChoThue') && (
+                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                              Người cho thuê
+                            </span>
+                          )}
+                          {selectedKhachHang.vaiTroPhu.includes('nhaProviderDichVu') && (
+                            <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                              Nhà cung cấp dịch vụ
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
