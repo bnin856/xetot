@@ -3,6 +3,7 @@ import XacThuc from '../models/XacThuc';
 import User from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { toWebPath } from '../middleware/upload';
 
 // Upload xác thực
 export const uploadXacThuc = async (
@@ -38,7 +39,7 @@ export const uploadXacThuc = async (
 
     const hinhAnhMatTruoc = files[0]?.path;
     const hinhAnhMatSau = files[1]?.path;
-    const hinhAnhGiayToXe = files.slice(2).map((f) => f.path);
+    const hinhAnhGiayToXe = files.slice(2).map((f) => toWebPath(f.path));
 
     const xacThuc = await XacThuc.create({
       idNguoiDung: userId,
