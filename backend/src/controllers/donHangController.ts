@@ -337,7 +337,7 @@ export const updateTrangThaiDonHang = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { trangThai } = req.body;
+    const { trangThai, lyDoHuy } = req.body;
 
     const donHang = await DonHang.findById(req.params.id);
     if (!donHang) {
@@ -346,6 +346,12 @@ export const updateTrangThaiDonHang = async (
     }
 
     donHang.trangThai = trangThai;
+
+    if (trangThai === 'daHuy') {
+      donHang.nguoiHuy = 'admin';
+      donHang.lyDoHuy = lyDoHuy || 'Admin hủy đơn hàng';
+    }
+
     await donHang.save();
 
     // If delivered, update xe status
@@ -353,6 +359,15 @@ export const updateTrangThaiDonHang = async (
       const xe = await Xe.findById(donHang.idXe);
       if (xe) {
         xe.trangThai = 'daBan';
+        await xe.save();
+      }
+    }
+
+    // If cancelled, re-open the xe for other buyers
+    if (trangThai === 'daHuy') {
+      const xe = await Xe.findById(donHang.idXe);
+      if (xe && xe.trangThai === 'dangCho') {
+        xe.trangThai = 'dangBan';
         await xe.save();
       }
     }

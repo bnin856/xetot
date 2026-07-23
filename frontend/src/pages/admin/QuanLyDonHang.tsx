@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, CheckCircle, XCircle, ShoppingCart, Car, Calendar } from 'lucide-react';
 import AdminLayout from '../../components/Layout/AdminLayout';
 import { motion } from 'framer-motion';
@@ -11,6 +12,7 @@ import { DonThueXe } from '../../services/donThueXeService';
 import { getImageUrl } from '../../utils/image';
 
 const QuanLyDonHang: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'mua' | 'thue' | 'xeBan' | 'xeThue'>('mua');
   const [donHang, setDonHang] = useState<DonHang[]>([]);
   const [donThueXe, setDonThueXe] = useState<DonThueXe[]>([]);
@@ -62,13 +64,40 @@ const QuanLyDonHang: React.FC = () => {
     }
   };
 
+  const handleApproveDonHang = async (id: string) => {
+    if (!window.confirm('Xác nhận đơn hàng này thay cho người bán?')) return;
+    try {
+      await donHangService.updateTrangThai(id, 'nguoiBanDaXacNhan');
+      fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
+    }
+  };
+
+  const handleRejectDonHang = async (id: string) => {
+    const lyDo = window.prompt('Lý do từ chối đơn hàng này:');
+    if (lyDo === null) return;
+    try {
+      await donHangService.updateTrangThai(id, 'daHuy', lyDo || undefined);
+      fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
+    }
+  };
+
   const getTrangThaiBadge = (trangThai: string) => {
     const badges: Record<string, { text: string; color: string }> = {
-      choXacNhan: { text: 'Chờ xác nhận', color: 'bg-yellow-100 text-yellow-800' },
-      daXacNhan: { text: 'Đã xác nhận', color: 'bg-blue-100 text-blue-800' },
+      choNguoiBanXacNhan: { text: 'Chờ người bán xác nhận', color: 'bg-yellow-100 text-yellow-800' },
+      nguoiBanDaXacNhan: { text: 'Người bán đã xác nhận', color: 'bg-blue-100 text-blue-800' },
+      choThanhToan: { text: 'Chờ thanh toán', color: 'bg-orange-100 text-orange-800' },
+      choXacNhanThanhToan: { text: 'Chờ xác nhận thanh toán', color: 'bg-cyan-100 text-cyan-800' },
+      daThanhToan: { text: 'Đã thanh toán', color: 'bg-blue-100 text-blue-800' },
       dangGiao: { text: 'Đang giao', color: 'bg-purple-100 text-purple-800' },
-      daGiao: { text: 'Đã giao', color: 'bg-green-100 text-green-800' },
-      daHuy: { text: 'Đã hủy', color: 'bg-red-100 text-red-800' },
+      choKiemTra: { text: 'Chờ khách kiểm tra', color: 'bg-indigo-100 text-indigo-800' },
+      tranh_chap_xe_sai: { text: 'Tranh chấp: Xe sai mô tả', color: 'bg-red-100 text-red-800' },
+      tranh_chap_khach_huy: { text: 'Tranh chấp: Khách hủy', color: 'bg-red-100 text-red-800' },
+      daHoanThanh: { text: 'Hoàn tất', color: 'bg-green-100 text-green-800' },
+      daHuy: { text: 'Đã hủy', color: 'bg-gray-100 text-gray-800' },
     };
     return badges[trangThai] || { text: trangThai, color: 'bg-gray-100 text-gray-800' };
   };
@@ -242,15 +271,27 @@ const QuanLyDonHang: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded">
+                          <button
+                            onClick={() => navigate(`/customer/don-hang/${don.id}`)}
+                            className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded"
+                            title="Xem chi tiết"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
                           {don.trangThai === 'choNguoiBanXacNhan' && (
                             <>
-                              <button className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded">
+                              <button
+                                onClick={() => handleApproveDonHang(don.id)}
+                                className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded"
+                                title="Xác nhận thay người bán"
+                              >
                                 <CheckCircle className="w-4 h-4" />
                               </button>
-                              <button className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded">
+                              <button
+                                onClick={() => handleRejectDonHang(don.id)}
+                                className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded"
+                                title="Từ chối đơn hàng"
+                              >
                                 <XCircle className="w-4 h-4" />
                               </button>
                             </>

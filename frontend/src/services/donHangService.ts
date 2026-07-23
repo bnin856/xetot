@@ -47,9 +47,10 @@ export const donHangService = {
 
   updateTrangThai: async (
     id: string,
-    trangThai: string
+    trangThai: string,
+    lyDoHuy?: string
   ): Promise<{ success: boolean; data: { donHang: DonHang } }> => {
-    const response = await api.put(`/don-hang/${id}/trang-thai`, { trangThai });
+    const response = await api.put(`/don-hang/${id}/trang-thai`, { trangThai, lyDoHuy });
     return response.data;
   },
 
