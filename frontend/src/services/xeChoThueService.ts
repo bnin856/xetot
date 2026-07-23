@@ -8,6 +8,7 @@ export interface XeChoThueFilters {
   loaiXe?: string;
   soCho?: number;
   trangThai?: string;
+  idChuXe?: string;
 }
 
 const xeChoThueService = {
@@ -20,6 +21,7 @@ const xeChoThueService = {
     if (filters.loaiXe) params.append('loaiXe', filters.loaiXe);
     if (filters.soCho) params.append('soCho', filters.soCho.toString());
     if (filters.trangThai) params.append('trangThai', filters.trangThai);
+    if (filters.idChuXe) params.append('idChuXe', filters.idChuXe);
 
     const response = await api.get(`/xe-cho-thue?${params.toString()}`);
     return response.data.data.xe || [];

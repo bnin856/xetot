@@ -11,6 +11,7 @@ export interface XeFilters {
   namSanXuat?: number;
   soCho?: number;
   trangThai?: string;
+  idChuXe?: string;
 }
 
 export interface XeResponse {
@@ -38,6 +39,7 @@ export const xeService = {
     if (filters.namSanXuat) params.append('namSanXuat', filters.namSanXuat.toString());
     if (filters.soCho) params.append('soCho', filters.soCho.toString());
     if (filters.trangThai) params.append('trangThai', filters.trangThai);
+    if (filters.idChuXe) params.append('idChuXe', filters.idChuXe);
 
     const response = await api.get(`/xe?${params.toString()}`);
     return response.data;

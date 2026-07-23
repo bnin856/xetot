@@ -53,6 +53,12 @@ const donThueXeService = {
     return response.data;
   },
 
+  // Lấy đơn thuê của các xe do tôi đăng cho thuê
+  getOrdersForOwner: async (): Promise<{ success: boolean; data: DonThueXe[] }> => {
+    const response = await api.get('/don-thue-xe/nguoi-cho-thue');
+    return response.data;
+  },
+
   // Lấy đơn thuê xe theo ID
   getDonThueXeById: async (id: string): Promise<DonThueXe> => {
     const response = await api.get(`/don-thue-xe/${id}`);

@@ -72,6 +72,29 @@ export const donHangService = {
     return response.data;
   },
 
+  // Đơn hàng của các xe do tôi đăng bán
+  getOrdersForSeller: async (): Promise<{ success: boolean; data: { donHang: DonHang[] } }> => {
+    const response = await api.get('/don-hang/nguoi-ban');
+    return response.data;
+  },
+
+  // Người bán chấp nhận đơn hàng mới
+  xacNhanDonHang: async (
+    id: string
+  ): Promise<{ success: boolean; data: { donHang: DonHang } }> => {
+    const response = await api.post(`/don-hang/${id}/xac-nhan-don-hang`);
+    return response.data;
+  },
+
+  // Người bán từ chối đơn hàng mới
+  tuChoiDonHang: async (
+    id: string,
+    lyDo: string
+  ): Promise<{ success: boolean; data: { donHang: DonHang } }> => {
+    const response = await api.post(`/don-hang/${id}/tu-choi-don-hang`, { lyDo });
+    return response.data;
+  },
+
   khachXacNhan: async (
     id: string
   ): Promise<{ success: boolean; data: { donHang: DonHang } }> => {

@@ -1,31 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Wrench, DollarSign, Users, TrendingUp, Package, Plus } from 'lucide-react';
+import { Wrench, DollarSign, Users, Package, Plus, Eye } from 'lucide-react';
 import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import walletService, { Wallet } from '../../services/walletService';
+import dichVuService from '../../services/dichVuService';
+import lichDatDichVuService from '../../services/lichDatDichVuService';
+import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 
 const ServiceProviderDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
-    dichVuHoatDong: 5,
-    donDichVuMoi: 12,
-    tongDoanhThu: 45000000,
-    khachHangThanThiet: 23,
+    dichVuHoatDong: 0,
+    donDichVuMoi: 0,
+    tongDoanhThu: 0,
+    khachHangThanThiet: 0,
   });
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user) fetchData();
+  }, [user]);
 
   const fetchData = async () => {
     try {
-      const walletRes = await walletService.getMyWallet();
+      const [walletRes, dichVuRes, lichDatRes] = await Promise.all([
+        walletService.getMyWallet(),
+        dichVuService.getAll({ idNguoiCungCap: user!.id, limit: 1000 }),
+        lichDatDichVuService.getMySchedules('nguoiCungCap'),
+      ]);
+
       if (walletRes.success) {
         setWallet(walletRes.data.wallet);
       }
-      // TODO: Fetch service stats
+
+      const dichVuHoatDong = dichVuRes.success
+        ? dichVuRes.data.dichVu.filter((d: any) => d.trangThai === 'hoatDong').length
+        : 0;
+
+      const lichDat = lichDatRes.success ? lichDatRes.data.lichDat : [];
+      const donDichVuMoi = lichDat.filter((l) => l.trangThai === 'choDuyet').length;
+      const tongDoanhThu = lichDat
+        .filter((l) => l.trangThai === 'daHoanThanh')
+        .reduce((sum, l) => sum + (l.idDichVu?.giaThamKhao || 0), 0);
+      const khachHangThanThiet = new Set(lichDat.map((l) => l.idKhachHang?._id).filter(Boolean)).size;
+
+      setStats({ dichVuHoatDong, donDichVuMoi, tongDoanhThu, khachHangThanThiet });
     } catch (error) {
       console.error('Error fetching service data:', error);
     } finally {
@@ -111,10 +132,14 @@ const ServiceProviderDashboard: React.FC = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="card p-6">
               <h3 className="text-xl font-bold text-gray-800 mb-4">Thao tác nhanh</h3>
               <div className="space-y-3">
-                <button className="w-full btn-primary flex items-center justify-center space-x-2">
+                <Link to="/dang-ky-dich-vu" className="w-full btn-primary flex items-center justify-center space-x-2">
                   <Plus className="w-5 h-5" />
                   <span>Tạo dịch vụ mới</span>
-                </button>
+                </Link>
+                <Link to="/lich-dat-dich-vu" className="w-full btn-secondary flex items-center justify-center space-x-2">
+                  <Eye className="w-5 h-5" />
+                  <span>Xem lịch đặt {stats.donDichVuMoi > 0 && `(${stats.donDichVuMoi} mới)`}</span>
+                </Link>
                 <Link to="/dich-vu" className="block w-full btn-secondary text-center">Xem tất cả dịch vụ</Link>
               </div>
             </motion.div>

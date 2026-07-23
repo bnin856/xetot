@@ -19,7 +19,9 @@ import QuanLyTraanhChap from './pages/admin/QuanLyTraanhChap';
 import QuanLyVi from './pages/customer/QuanLyVi';
 import LichSuGiaoDich from './pages/customer/LichSuGiaoDich';
 import SellerDashboard from './pages/seller/SellerDashboard';
+import QuanLyDonHangBan from './pages/seller/QuanLyDonHangBan';
 import RentalDashboard from './pages/rental/RentalDashboard';
+import QuanLyDonThueXe from './pages/rental/QuanLyDonThueXe';
 import ServiceProviderDashboard from './pages/service/ServiceProviderDashboard';
 import LichSuDonHang from './pages/customer/LichSuDonHang';
 import TaiKhoan from './pages/customer/TaiKhoan';
@@ -201,6 +203,52 @@ function App() {
             element={
               <ProtectedRoute>
                 <XeYeuThich />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Seller Routes */}
+          <Route
+            path="/seller"
+            element={
+              <ProtectedRoute>
+                <SellerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seller/don-hang"
+            element={
+              <ProtectedRoute>
+                <QuanLyDonHangBan />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rental Routes */}
+          <Route
+            path="/rental"
+            element={
+              <ProtectedRoute>
+                <RentalDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rental/don-thue"
+            element={
+              <ProtectedRoute>
+                <QuanLyDonThueXe />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Service Provider Routes */}
+          <Route
+            path="/service"
+            element={
+              <ProtectedRoute>
+                <ServiceProviderDashboard />
               </ProtectedRoute>
             }
           />

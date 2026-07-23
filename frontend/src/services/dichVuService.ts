@@ -6,6 +6,7 @@ export interface DichVuFilters {
   search?: string;
   loaiDichVu?: string;
   trangThai?: string;
+  idNguoiCungCap?: string;
 }
 
 const dichVuService = {
@@ -16,6 +17,7 @@ const dichVuService = {
     if (filters.search) params.append('search', filters.search);
     if (filters.loaiDichVu) params.append('loaiDichVu', filters.loaiDichVu);
     if (filters.trangThai) params.append('trangThai', filters.trangThai);
+    if (filters.idNguoiCungCap) params.append('idNguoiCungCap', filters.idNguoiCungCap);
 
     const response = await api.get(`/dich-vu?${params.toString()}`);
     return response.data;
