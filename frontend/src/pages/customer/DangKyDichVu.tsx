@@ -86,7 +86,7 @@ const DangKyDichVu: React.FC = () => {
       let response = await dichVuService.create(submitData);
       
       if (response.success) {
-        alert('Đăng ký dịch vụ thành công! Dịch vụ của bạn đang chờ duyệt.');
+        alert('Đăng ký dịch vụ thành công! Dịch vụ của bạn đã hiển thị công khai.');
         navigate('/');
       }
     } catch (error: any) {

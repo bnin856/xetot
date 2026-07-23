@@ -112,7 +112,7 @@ const DangBanXe: React.FC = () => {
       let response = await xeService.create(submitData);
       
       if (response.success) {
-        alert('Đăng bán xe thành công! Xe của bạn đang chờ duyệt.');
+        alert('Đăng bán xe thành công! Xe của bạn đã hiển thị công khai.');
         navigate('/');
       }
     } catch (error: any) {

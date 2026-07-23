@@ -125,7 +125,7 @@ const DangChoThueXe: React.FC = () => {
       let response = await xeChoThueService.create(submitData);
       
       if (response.success) {
-        alert('Đăng cho thuê xe thành công! Xe của bạn đang chờ duyệt.');
+        alert('Đăng cho thuê xe thành công! Xe của bạn đã hiển thị công khai.');
         navigate('/');
       }
     } catch (error: any) {
