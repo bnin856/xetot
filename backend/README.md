@@ -28,6 +28,7 @@ cp .env.example .env
 - `JWT_SECRET`: Secret key cho JWT
 - `PORT`: Port cho server (mặc định 5000)
 - `AUTO_APPROVE_KYC`: Tự động duyệt KYC (true/false, mặc định false) - Xem thêm `KYC_AUTO_APPROVE.md`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Bắt buộc khi deploy production (VD: Render), vì filesystem trên đó là ephemeral - file upload sẽ mất khi container redeploy/restart nếu không cấu hình. Có thể để trống khi chạy dev local (sẽ tự fallback lưu vào thư mục `uploads/` trên đĩa)
 
 4. Đảm bảo MongoDB đang chạy
 
@@ -108,6 +109,8 @@ Authorization: Bearer <token>
 ## File Upload
 
 Upload ảnh xe sử dụng multipart/form-data với field name `hinhAnh` (có thể upload nhiều ảnh).
+
+Khi đã cấu hình biến môi trường `CLOUDINARY_*`, file được đẩy thẳng lên Cloudinary (không lưu đĩa) và các model lưu URL Cloudinary trực tiếp. Nếu chưa cấu hình, hệ thống fallback lưu vào thư mục `uploads/` cục bộ như trước - **không dùng cách này cho production trên Render** vì filesystem ở đó là ephemeral (mất dữ liệu mỗi lần container redeploy/restart/sleep).
 
 ## Cấu trúc thư mục
 
