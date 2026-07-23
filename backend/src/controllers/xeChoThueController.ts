@@ -115,7 +115,7 @@ export const createXeChoThue = async (
       return;
     }
 
-    if (!user.xacThuc?.daXacThuc) {
+    if (user.vaiTro !== 'admin' && !user.xacThuc?.daXacThuc) {
       next(createError('Bạn cần xác thực tài khoản (KYC) trước khi đăng cho thuê xe. Vui lòng vào trang xác thực để hoàn tất.', 403));
       return;
     }

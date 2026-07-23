@@ -125,8 +125,8 @@ export const createXe = async (
       return;
     }
 
-    // Kiểm tra xem user đã xác thực chưa
-    if (!user.xacThuc?.daXacThuc) {
+    // Kiểm tra xem user đã xác thực chưa (admin quản lý trực tiếp thì bỏ qua)
+    if (user.vaiTro !== 'admin' && !user.xacThuc?.daXacThuc) {
       next(createError('Bạn cần xác thực tài khoản (KYC) trước khi đăng bán xe. Vui lòng vào trang xác thực để hoàn tất.', 403));
       return;
     }
