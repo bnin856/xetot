@@ -371,7 +371,7 @@ const ChiTietXe: React.FC = () => {
                           className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-all font-medium"
                         >
                           <Phone className="w-4 h-4" />
-                          <span>{user ? '093 355 1234' : 'Gọi điện'}</span>
+                          <span>Gọi điện</span>
                         </button>
                         {xe.idChuXe && (
                           <button
