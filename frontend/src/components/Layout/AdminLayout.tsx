@@ -58,7 +58,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:shadow-none transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed lg:relative inset-y-0 left-0 z-50 w-64 h-screen bg-white shadow-lg lg:shadow-none transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -69,7 +69,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </button>
         </div>
 
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-4rem)] lg:h-screen">
+        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100%-4rem-5rem)] lg:h-[calc(100%-5rem)]">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
