@@ -37,3 +37,6 @@ export const upload = multer({
 export const uploadSingle = upload.single('bienLai'); // Upload 1 ảnh biên lai
 export const uploadMultiple = upload.array('hinhAnh', 10); // Tối đa 10 ảnh
 
+// multer trả về file.path với dấu \ trên Windows, cần chuẩn hoá về / để dùng làm URL
+export const toWebPath = (filePath: string): string => filePath.replace(/\\/g, '/');
+
