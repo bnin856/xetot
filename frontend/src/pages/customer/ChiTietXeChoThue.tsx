@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import xeChoThueService from '../../services/xeChoThueService';
 import ChatModal from '../../components/Chat/ChatModal';
-import DatLichModal from '../../components/LichXemXe/DatLichModal';
+import { getImageUrl } from '../../utils/image';
 
 interface XeChoThue {
   _id: string;
@@ -56,7 +56,6 @@ const ChiTietXeChoThue: React.FC = () => {
   const { user } = useAuth();
   const [xe, setXe] = useState<XeChoThue | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDatLichModal, setShowDatLichModal] = useState(false);
   const [showDatThueModal, setShowDatThueModal] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -185,7 +184,7 @@ const ChiTietXeChoThue: React.FC = () => {
                 {/* Main Image */}
                 <div className="relative aspect-video bg-gray-100">
                   <img
-                    src={xe.hinhAnh?.[selectedImage] || '/placeholder-car.jpg'}
+                    src={xe.hinhAnh?.[selectedImage] ? getImageUrl(xe.hinhAnh[selectedImage]) : '/placeholder-car.jpg'}
                     alt={xe.tenXe}
                     className="w-full h-full object-cover"
                   />
@@ -233,7 +232,7 @@ const ChiTietXeChoThue: React.FC = () => {
                         }`}
                       >
                         <img
-                          src={img || '/placeholder-car.jpg'}
+                          src={img ? getImageUrl(img) : '/placeholder-car.jpg'}
                           alt={`${xe.tenXe} ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -350,7 +349,7 @@ const ChiTietXeChoThue: React.FC = () => {
                 {laChuXe ? (
                   <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-center">
                     <p className="text-sm font-semibold text-blue-800">Đây là xe của bạn</p>
-                    <p className="text-xs text-blue-600 mt-1">Bạn không thể thuê hoặc đặt lịch xem xe do chính mình đăng cho thuê</p>
+                    <p className="text-xs text-blue-600 mt-1">Bạn không thể thuê xe do chính mình đăng cho thuê</p>
                   </div>
                 ) : (
                 <div className="space-y-3">
@@ -393,23 +392,6 @@ const ChiTietXeChoThue: React.FC = () => {
                       </button>
                     )}
                   </div>
-
-                  {xe.idChuXe && (
-                    <button
-                      onClick={() => {
-                        if (!user) {
-                          alert('Vui lòng đăng nhập để đặt lịch xem xe');
-                          navigate('/dang-nhap');
-                          return;
-                        }
-                        setShowDatLichModal(true);
-                      }}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                    >
-                      <Calendar className="w-5 h-5" />
-                      Đặt lịch xem xe
-                    </button>
-                  )}
                 </div>
                 )}
 
@@ -454,15 +436,6 @@ const ChiTietXeChoThue: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Dat Lich Modal */}
-      {showDatLichModal && xe && (
-        <DatLichModal
-          idXe={xe._id}
-          tenXe={xe.tenXe}
-          onClose={() => setShowDatLichModal(false)}
-        />
-      )}
 
       {/* Dat Thue Modal - Chọn cách liên hệ */}
       <AnimatePresence>
@@ -515,27 +488,6 @@ const ChiTietXeChoThue: React.FC = () => {
                   <div className="flex-1 text-left">
                     <h3 className="font-semibold text-gray-800">Nhắn tin với người cho thuê</h3>
                     <p className="text-sm text-gray-600">Trao đổi trực tiếp về xe</p>
-                  </div>
-                </button>
-
-                {/* Đặt lịch xem xe */}
-                <button
-                  onClick={() => {
-                    if (!xe.idChuXe) {
-                      alert('Không tìm thấy thông tin người cho thuê');
-                      return;
-                    }
-                    setShowDatThueModal(false);
-                    setShowDatLichModal(true);
-                  }}
-                  className="w-full flex items-center gap-4 p-4 border-2 border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition-all group"
-                >
-                  <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition">
-                    <Calendar className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <h3 className="font-semibold text-gray-800">Đặt lịch xem xe</h3>
-                    <p className="text-sm text-gray-600">Hẹn gặp để xem xe trực tiếp</p>
                   </div>
                 </button>
 

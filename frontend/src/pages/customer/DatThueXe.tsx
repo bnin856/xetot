@@ -402,7 +402,7 @@ const DatThueXe: React.FC = () => {
                 {/* Car Info */}
                 <div className="flex space-x-4 mb-6 pb-6 border-b border-gray-200">
                   <img
-                    src={xe.hinhAnh?.[0] || '/placeholder-car.jpg'}
+                    src={xe.hinhAnh?.[0] ? getImageUrl(xe.hinhAnh[0]) : '/placeholder-car.jpg'}
                     alt={xe.tenXe}
                     className="w-24 h-24 object-cover rounded-lg"
                   />
