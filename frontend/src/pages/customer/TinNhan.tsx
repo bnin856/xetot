@@ -7,6 +7,7 @@ import chatService, { Conversation } from '../../services/chatService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import ChatModal from '../../components/Chat/ChatModal';
+import { getImageUrl } from '../../utils/image';
 
 const TinNhan: React.FC = () => {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ const TinNhan: React.FC = () => {
     if (xeId && conversations.length > 0) {
       // Tìm conversation với xe này
       const conv = conversations.find(
-        (c) => c.idXe._id === xeId && (c.loaiXe || 'xe') === loaiXe
+        (c) => typeof c.idXe === 'object' && c.idXe._id === xeId && (c.loaiXe || 'xe') === loaiXe
       );
       
       if (conv) {
@@ -106,7 +107,7 @@ const TinNhan: React.FC = () => {
     const otherUser = getOtherUser(conv);
     const searchLower = searchTerm.toLowerCase();
     
-    const tenXe = conv.idXe?.tenXe || '';
+    const tenXe = typeof conv.idXe === 'object' ? conv.idXe?.tenXe || '' : '';
     const tenNguoiDung = otherUser?.ten || '';
     
     return (
@@ -183,26 +184,27 @@ const TinNhan: React.FC = () => {
                 {filteredConversations.map((conversation) => {
                   const otherUser = getOtherUser(conversation);
                   const unreadCount = getUnreadCount(conversation);
+                  const xeDaXoa = typeof conversation.idXe !== 'object';
 
                   return (
                     <motion.div
                       key={conversation._id}
                       whileHover={{ scale: 1.01 }}
-                      onClick={() => setSelectedConversation(conversation)}
-                      className="card p-4 cursor-pointer hover:shadow-lg transition-all"
+                      onClick={() => !xeDaXoa && setSelectedConversation(conversation)}
+                      className={`card p-4 transition-all ${xeDaXoa ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg'}`}
                     >
                       <div className="flex gap-4">
                         {/* Xe Image */}
                         <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                          {conversation.idXe.hinhAnh && conversation.idXe.hinhAnh.length > 0 ? (
+                          {!xeDaXoa && conversation.idXe.hinhAnh && conversation.idXe.hinhAnh.length > 0 ? (
                             <img
-                              src={`http://localhost:5000/${conversation.idXe.hinhAnh[0]}`}
+                              src={getImageUrl(conversation.idXe.hinhAnh[0])}
                               alt={conversation.idXe.tenXe}
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              No image
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center px-1">
+                              {xeDaXoa ? 'Tin đã bị xóa' : 'No image'}
                             </div>
                           )}
                         </div>
@@ -211,7 +213,7 @@ const TinNhan: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-1">
                             <h3 className="font-semibold text-lg truncate">
-                              {conversation.idXe.tenXe}
+                              {xeDaXoa ? 'Xe/tin đăng đã bị xóa' : conversation.idXe.tenXe}
                             </h3>
                             {unreadCount > 0 && (
                               <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">
@@ -220,9 +222,11 @@ const TinNhan: React.FC = () => {
                             )}
                           </div>
 
-                          <p className="text-primary-600 font-semibold mb-2">
-                            {formatPrice(conversation.idXe.gia)}
-                          </p>
+                          {!xeDaXoa && (
+                            <p className="text-primary-600 font-semibold mb-2">
+                              {formatPrice(conversation.idXe.gia)}
+                            </p>
+                          )}
 
                           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                             <User className="w-4 h-4" />
@@ -252,7 +256,7 @@ const TinNhan: React.FC = () => {
       </div>
 
       {/* Chat Modal */}
-      {selectedConversation && (
+      {selectedConversation && typeof selectedConversation.idXe === 'object' && (
         <ChatModal
           idXe={selectedConversation.idXe._id}
           tenXe={selectedConversation.idXe.tenXe}

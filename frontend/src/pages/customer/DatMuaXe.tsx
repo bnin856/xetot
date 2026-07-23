@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { xeService } from '../../services/xeService';
 import { donHangService } from '../../services/donHangService';
 import { Xe } from '../../types';
+import { getImageUrl } from '../../utils/image';
 import { 
   topBanks, 
   calculateMonthlyPayment, 
@@ -243,7 +244,7 @@ const DatMuaXe: React.FC = () => {
                     <div className="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden">
                       {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                         <img
-                          src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                          src={getImageUrl(xe.hinhAnh[0])}
                           alt={xe.tenXe}
                           className="w-full h-full object-cover"
                         />
@@ -925,7 +926,7 @@ const DatMuaXe: React.FC = () => {
             <div className="flex space-x-4 p-4 bg-gray-50 rounded-lg">
               {invoice.xe?.hinhAnh && invoice.xe.hinhAnh.length > 0 && (
                 <img
-                  src={`http://localhost:5000/${invoice.xe.hinhAnh[0]}`}
+                  src={getImageUrl(invoice.xe.hinhAnh[0])}
                   alt={invoice.xe.tenXe}
                   className="w-24 h-24 object-cover rounded-lg"
                 />

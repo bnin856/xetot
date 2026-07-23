@@ -5,6 +5,7 @@ import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import xeChoThueService from '../../services/xeChoThueService';
 import HotSearchDropdown from '../../components/HotSearchDropdown';
+import { getImageUrl } from '../../utils/image';
 
 interface XeChoThue {
   _id: string;
@@ -209,7 +210,7 @@ const ThueXe: React.FC = () => {
                       <div className="h-48 bg-gray-200 relative">
                         {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                           <img
-                            src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                            src={getImageUrl(xe.hinhAnh[0])}
                             alt={xe.tenXe}
                             className="w-full h-full object-cover"
                           />

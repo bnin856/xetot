@@ -4,6 +4,7 @@ import AdminLayout from '../../components/Layout/AdminLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { xeService } from '../../services/xeService';
 import { Xe } from '../../types';
+import { getImageUrl } from '../../utils/image';
 
 const QuanLyXe: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -298,7 +299,7 @@ const QuanLyXe: React.FC = () => {
                         <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
                           {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                             <img
-                              src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                              src={getImageUrl(xe.hinhAnh[0])}
                               alt={xe.tenXe}
                               className="w-full h-full object-cover"
                             />
@@ -539,7 +540,7 @@ const QuanLyXe: React.FC = () => {
                       <div className="grid grid-cols-4 gap-2 mt-2">
                         {hinhAnhPreview.map((img, index) => (
                           <div key={index} className="relative">
-                            <img src={img.startsWith('http') ? img : `http://localhost:5000/${img}`} alt={`Preview ${index}`} className="w-full h-24 object-cover rounded" />
+                            <img src={getImageUrl(img)} alt={`Preview ${index}`} className="w-full h-24 object-cover rounded" />
                             <button
                               type="button"
                               onClick={() => removeImage(index)}
@@ -638,7 +639,7 @@ const QuanLyXe: React.FC = () => {
                     {selectedXe.hinhAnh.map((img, index) => (
                       <img
                         key={index}
-                        src={`http://localhost:5000/${img}`}
+                        src={getImageUrl(img)}
                         alt={`${selectedXe.tenXe} ${index + 1}`}
                         className="w-full h-32 object-cover rounded"
                       />

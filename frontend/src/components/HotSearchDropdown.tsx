@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Clock } from 'lucide-react';
 import { Xe } from '../types';
 import { xeService } from '../services/xeService';
+import { getImageUrl } from '../utils/image';
 
 interface XeChoThue {
   id: string;
@@ -126,7 +127,7 @@ const HotSearchDropdown: React.FC<HotSearchDropdownProps> = ({
                 <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                   {item.hinhAnh && item.hinhAnh.length > 0 ? (
                     <img
-                      src={`http://localhost:5000/${item.hinhAnh[0]}`}
+                      src={getImageUrl(item.hinhAnh[0])}
                       alt={item.tenXe}
                       className="w-full h-full object-cover"
                     />

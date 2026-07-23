@@ -3,6 +3,7 @@ import { CheckCircle, XCircle, Eye, Clock, AlertCircle } from 'lucide-react';
 import AdminLayout from '../../components/Layout/AdminLayout';
 import { motion } from 'framer-motion';
 import xacThucService, { XacThuc } from '../../services/xacThucService';
+import { getImageUrl } from '../../utils/image';
 
 const QuanLyXacThuc: React.FC = () => {
   const [xacThucs, setXacThucs] = useState<XacThuc[]>([]);
@@ -293,7 +294,7 @@ const QuanLyXacThuc: React.FC = () => {
                   <div>
                     <p className="text-sm font-medium mb-2">Mặt trước</p>
                     <img
-                      src={`http://localhost:5000/${selectedXacThuc.hinhAnhMatTruoc}`}
+                      src={getImageUrl(selectedXacThuc.hinhAnhMatTruoc)}
                       alt="Mặt trước"
                       className="w-full border rounded-lg"
                     />
@@ -301,7 +302,7 @@ const QuanLyXacThuc: React.FC = () => {
                   <div>
                     <p className="text-sm font-medium mb-2">Mặt sau</p>
                     <img
-                      src={`http://localhost:5000/${selectedXacThuc.hinhAnhMatSau}`}
+                      src={getImageUrl(selectedXacThuc.hinhAnhMatSau)}
                       alt="Mặt sau"
                       className="w-full border rounded-lg"
                     />
@@ -318,7 +319,7 @@ const QuanLyXacThuc: React.FC = () => {
                       <div key={index}>
                         <p className="text-sm font-medium mb-2">Hình {index + 1}</p>
                         <img
-                          src={`http://localhost:5000/${img}`}
+                          src={getImageUrl(img)}
                           alt={`Giấy tờ xe ${index + 1}`}
                           className="w-full border rounded-lg"
                         />

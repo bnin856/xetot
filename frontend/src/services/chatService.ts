@@ -18,7 +18,8 @@ export interface Message {
 export interface Conversation {
   _id: string;
   loaiXe?: 'xe' | 'xeChoThue';
-  idXe: {
+  // Là chuỗi ID nếu xe/xe cho thuê đã bị xóa (không tìm thấy để gắn thông tin)
+  idXe: string | {
     _id: string;
     tenXe: string;
     hinhAnh: string[];

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { donHangService } from '../../services/donHangService';
 import donThueXeService, { DonThueXe } from '../../services/donThueXeService';
 import { DonHang } from '../../types';
+import { getImageUrl } from '../../utils/image';
 
 const LichSuDonHang: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -164,7 +165,7 @@ const LichSuDonHang: React.FC = () => {
                         <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden">
                           {xe && xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                             <img
-                              src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                              src={getImageUrl(xe.hinhAnh[0])}
                               alt={xe.tenXe}
                               className="w-full h-full object-cover"
                             />
@@ -232,7 +233,7 @@ const LichSuDonHang: React.FC = () => {
                         <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden">
                           {don.idXeChoThue.hinhAnh && don.idXeChoThue.hinhAnh.length > 0 ? (
                             <img
-                              src={`http://localhost:5000/${don.idXeChoThue.hinhAnh[0]}`}
+                              src={getImageUrl(don.idXeChoThue.hinhAnh[0])}
                               alt={don.idXeChoThue.tenXe}
                               className="w-full h-full object-cover"
                             />

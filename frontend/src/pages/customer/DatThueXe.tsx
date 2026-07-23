@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import xeChoThueService from '../../services/xeChoThueService';
 import donThueXeService from '../../services/donThueXeService';
+import { getImageUrl } from '../../utils/image';
 
 interface XeChoThue {
   _id: string;
@@ -496,7 +497,7 @@ const DatThueXe: React.FC = () => {
               <div className="flex space-x-4 p-4 bg-gray-50 rounded-lg">
                 {invoice.idXeChoThue?.hinhAnh && invoice.idXeChoThue.hinhAnh.length > 0 ? (
                   <img
-                    src={`http://localhost:5000/${invoice.idXeChoThue.hinhAnh[0]}`}
+                    src={getImageUrl(invoice.idXeChoThue.hinhAnh[0])}
                     alt={invoice.idXeChoThue.tenXe}
                     className="w-24 h-24 object-cover rounded-lg"
                   />

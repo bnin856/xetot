@@ -137,6 +137,8 @@ const ChiTietXeChoThue: React.FC = () => {
     );
   }
 
+  const laChuXe = !!user && !!xe.idChuXe?._id && xe.idChuXe._id === user.id;
+
   const trangThaiText = {
     sanSang: { text: 'Sẵn sàng', color: 'text-green-600 bg-green-100' },
     dangThue: { text: 'Đang thuê', color: 'text-yellow-600 bg-yellow-100' },
@@ -324,6 +326,12 @@ const ChiTietXeChoThue: React.FC = () => {
                 </div>
 
                 {/* Action Buttons */}
+                {laChuXe ? (
+                  <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-center">
+                    <p className="text-sm font-semibold text-blue-800">Đây là xe của bạn</p>
+                    <p className="text-xs text-blue-600 mt-1">Bạn không thể thuê hoặc đặt lịch xem xe do chính mình đăng cho thuê</p>
+                  </div>
+                ) : (
                 <div className="space-y-3">
                   <button
                     onClick={handleThueXe}
@@ -368,6 +376,7 @@ const ChiTietXeChoThue: React.FC = () => {
                     )}
                   </div>
                 </div>
+                )}
 
                 {/* Features */}
                 <div className="mt-6 pt-6 border-t border-gray-200">

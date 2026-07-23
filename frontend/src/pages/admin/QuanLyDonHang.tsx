@@ -8,6 +8,7 @@ import xeChoThueService from '../../services/xeChoThueService';
 import donThueXeService from '../../services/donThueXeService';
 import { DonHang, Xe } from '../../types';
 import { DonThueXe } from '../../services/donThueXeService';
+import { getImageUrl } from '../../utils/image';
 
 const QuanLyDonHang: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'mua' | 'thue' | 'xeBan' | 'xeThue'>('mua');
@@ -319,7 +320,7 @@ const QuanLyDonHang: React.FC = () => {
                           <div className="flex items-center gap-3">
                             {xe.hinhAnh && xe.hinhAnh.length > 0 && (
                               <img
-                                src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                                src={getImageUrl(xe.hinhAnh[0])}
                                 alt={xe.tenXe}
                                 className="w-12 h-12 object-cover rounded"
                               />
@@ -372,7 +373,7 @@ const QuanLyDonHang: React.FC = () => {
                           <div className="flex items-center gap-3">
                             {xe.hinhAnh && xe.hinhAnh.length > 0 && (
                               <img
-                                src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                                src={getImageUrl(xe.hinhAnh[0])}
                                 alt={xe.tenXe}
                                 className="w-12 h-12 object-cover rounded"
                               />

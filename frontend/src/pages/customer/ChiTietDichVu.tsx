@@ -130,9 +130,10 @@ const ChiTietDichVu: React.FC = () => {
     );
   }
 
-  const idNguoiCungCap = typeof dichVu.idNguoiCungCap === 'string' 
-    ? dichVu.idNguoiCungCap 
+  const idNguoiCungCap = typeof dichVu.idNguoiCungCap === 'string'
+    ? dichVu.idNguoiCungCap
     : dichVu.idNguoiCungCap?._id || '';
+  const laNguoiCungCap = !!user && !!idNguoiCungCap && idNguoiCungCap === user.id;
 
   return (
     <MainLayout>
@@ -258,7 +259,12 @@ const ChiTietDichVu: React.FC = () => {
 
 
                   {/* Đặt lịch ngay Button */}
-                  {user ? (
+                  {laNguoiCungCap ? (
+                    <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-center">
+                      <p className="text-sm font-semibold text-blue-800">Đây là dịch vụ của bạn</p>
+                      <p className="text-xs text-blue-600 mt-1">Bạn không thể đặt lịch dịch vụ do chính mình cung cấp</p>
+                    </div>
+                  ) : user ? (
                     <button
                       onClick={() => {
                         if (!idNguoiCungCap) {

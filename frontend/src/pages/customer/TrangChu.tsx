@@ -7,6 +7,7 @@ import { Xe } from '../../types';
 import { xeService } from '../../services/xeService';
 import { useAuth } from '../../contexts/AuthContext';
 import HotSearchDropdown from '../../components/HotSearchDropdown';
+import { getImageUrl } from '../../utils/image';
 
 const TrangChu: React.FC = () => {
   const { user } = useAuth();
@@ -223,7 +224,7 @@ const TrangChu: React.FC = () => {
                   <div className="h-48 bg-gray-200 relative">
                     {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                       <img
-                        src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                        src={getImageUrl(xe.hinhAnh[0])}
                         alt={xe.tenXe}
                         className="w-full h-full object-cover"
                       />

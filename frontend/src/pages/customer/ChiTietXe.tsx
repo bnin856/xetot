@@ -10,6 +10,7 @@ import { Xe } from '../../types';
 import ChatButton from '../../components/Chat/ChatButton';
 import ChatModal from '../../components/Chat/ChatModal';
 import DatLichModal from '../../components/LichXemXe/DatLichModal';
+import { getImageUrl } from '../../utils/image';
 
 const ChiTietXe: React.FC = () => {
   const { id } = useParams();
@@ -114,6 +115,9 @@ const ChiTietXe: React.FC = () => {
     );
   }
 
+  const idChuXeStr = typeof xe.idChuXe === 'string' ? xe.idChuXe : xe.idChuXe?._id;
+  const laChuXe = !!user && !!idChuXeStr && idChuXeStr === user.id;
+
   return (
     <MainLayout>
       <div className="page-container py-8">
@@ -138,7 +142,7 @@ const ChiTietXe: React.FC = () => {
                 <div className="h-96 bg-gray-200 rounded-lg mb-4 relative">
                   {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                     <img
-                      src={`http://localhost:5000/${xe.hinhAnh[hinhAnhChon]}`}
+                      src={getImageUrl(xe.hinhAnh[hinhAnhChon])}
                       alt={xe.tenXe}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -162,7 +166,7 @@ const ChiTietXe: React.FC = () => {
                         }`}
                       >
                         <img
-                          src={`http://localhost:5000/${img}`}
+                          src={getImageUrl(img)}
                           alt={`Hình ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -258,78 +262,87 @@ const ChiTietXe: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-2">Liên hệ người bán</p>
-                    <button 
-                      onClick={() => {
-                        if (!user) {
-                          navigate('/dang-nhap');
-                        } else {
-                          alert('Số điện thoại: 093 355 1234');
-                        }
-                      }}
-                      className="w-full btn-primary mb-2 flex items-center justify-center space-x-2"
-                    >
-                      <Phone className="w-5 h-5" />
-                      <span>{user ? '093 355 1234' : 'Xem số điện thoại'}</span>
-                    </button>
-                  </div>
-
-                  {/* Chat Button */}
-                  {xe.idChuXe && (
-                    <div className="mb-3">
-                      <button
-                        onClick={() => {
-                          if (!user) {
-                            alert('Vui lòng đăng nhập để chat với người bán');
-                            navigate('/dang-nhap');
-                            return;
-                          }
-                          setShowChatModal(true);
-                        }}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                      >
-                        <MessageCircle className="w-5 h-5" />
-                        Chat với người bán
-                      </button>
+                  {laChuXe ? (
+                    <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-center">
+                      <p className="text-sm font-semibold text-blue-800">Đây là xe của bạn</p>
+                      <p className="text-xs text-blue-600 mt-1">Bạn không thể mua hoặc đặt lịch xem xe do chính mình đăng bán</p>
                     </div>
-                  )}
-
-                  {/* Đặt lịch Button */}
-                  {xe.idChuXe && (
-                    <div className="mb-3">
-                      <button
-                        onClick={() => {
-                          if (!user) {
-                            alert('Vui lòng đăng nhập để đặt lịch xem xe');
-                            navigate('/dang-nhap');
-                            return;
-                          }
-                          // Mở modal đặt lịch ngay tại trang này
-                          setShowDatLichModal(true);
-                        }}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                      >
-                        <Calendar className="w-5 h-5" />
-                        Đặt lịch xem xe
-                      </button>
-                    </div>
-                  )}
-
-                  {user ? (
-                    <button
-                      onClick={() => setShowDatMuaModal(true)}
-                      className="block w-full btn-primary text-center"
-                    >
-                      Đặt mua ngay
-                    </button>
                   ) : (
-                    <Link
-                      to="/dang-nhap"
-                      className="block w-full btn-primary text-center"
-                    >
-                      Đăng nhập để đặt mua
-                    </Link>
+                    <>
+                      <div className="border-t pt-4">
+                        <p className="text-sm text-gray-600 mb-2">Liên hệ người bán</p>
+                        <button
+                          onClick={() => {
+                            if (!user) {
+                              navigate('/dang-nhap');
+                            } else {
+                              alert('Số điện thoại: 093 355 1234');
+                            }
+                          }}
+                          className="w-full btn-primary mb-2 flex items-center justify-center space-x-2"
+                        >
+                          <Phone className="w-5 h-5" />
+                          <span>{user ? '093 355 1234' : 'Xem số điện thoại'}</span>
+                        </button>
+                      </div>
+
+                      {/* Chat Button */}
+                      {xe.idChuXe && (
+                        <div className="mb-3">
+                          <button
+                            onClick={() => {
+                              if (!user) {
+                                alert('Vui lòng đăng nhập để chat với người bán');
+                                navigate('/dang-nhap');
+                                return;
+                              }
+                              setShowChatModal(true);
+                            }}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                          >
+                            <MessageCircle className="w-5 h-5" />
+                            Chat với người bán
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Đặt lịch Button */}
+                      {xe.idChuXe && (
+                        <div className="mb-3">
+                          <button
+                            onClick={() => {
+                              if (!user) {
+                                alert('Vui lòng đăng nhập để đặt lịch xem xe');
+                                navigate('/dang-nhap');
+                                return;
+                              }
+                              // Mở modal đặt lịch ngay tại trang này
+                              setShowDatLichModal(true);
+                            }}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                          >
+                            <Calendar className="w-5 h-5" />
+                            Đặt lịch xem xe
+                          </button>
+                        </div>
+                      )}
+
+                      {user ? (
+                        <button
+                          onClick={() => setShowDatMuaModal(true)}
+                          className="block w-full btn-primary text-center"
+                        >
+                          Đặt mua ngay
+                        </button>
+                      ) : (
+                        <Link
+                          to="/dang-nhap"
+                          className="block w-full btn-primary text-center"
+                        >
+                          Đăng nhập để đặt mua
+                        </Link>
+                      )}
+                    </>
                   )}
 
                   <div className="border-t pt-4 text-sm text-gray-600">

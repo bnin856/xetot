@@ -4,6 +4,7 @@ import { Calendar, MapPin, CreditCard, AlertCircle, CheckCircle, XCircle, Clock,
 import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import donThueXeService, { DonThueXe } from '../../services/donThueXeService';
+import { getImageUrl } from '../../utils/image';
 
 const ChiTietDonThueXe: React.FC = () => {
   const { id } = useParams();
@@ -110,7 +111,7 @@ const ChiTietDonThueXe: React.FC = () => {
                 <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200">
                   {donThueXe.idXeChoThue.hinhAnh && donThueXe.idXeChoThue.hinhAnh.length > 0 ? (
                     <img
-                      src={`http://localhost:5000/${donThueXe.idXeChoThue.hinhAnh[0]}`}
+                      src={getImageUrl(donThueXe.idXeChoThue.hinhAnh[0])}
                       alt={donThueXe.idXeChoThue.tenXe}
                       className="w-full h-full object-cover"
                     />

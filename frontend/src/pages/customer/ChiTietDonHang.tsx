@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { donHangService } from '../../services/donHangService';
 import escrowService from '../../services/escrowService';
 import { DonHang } from '../../types';
+import { getImageUrl } from '../../utils/image';
 
 const ChiTietDonHang: React.FC = () => {
   const { id } = useParams();
@@ -254,7 +255,7 @@ const ChiTietDonHang: React.FC = () => {
                     <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                       {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                         <img
-                          src={`http://localhost:5000/${xe.hinhAnh[0]}`}
+                          src={getImageUrl(xe.hinhAnh[0])}
                           alt={xe.tenXe}
                           className="w-full h-full object-cover"
                         />
