@@ -3,6 +3,7 @@ import DichVu from '../models/DichVu';
 import User from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { toWebPath } from '../middleware/upload';
 
 export const getAllDichVu = async (
   req: Request,
@@ -16,6 +17,7 @@ export const getAllDichVu = async (
       search,
       loaiDichVu,
       trangThai,
+      idNguoiCungCap,
     } = req.query;
 
     const query: any = {};
@@ -26,6 +28,7 @@ export const getAllDichVu = async (
 
     if (loaiDichVu) query.loaiDichVu = loaiDichVu;
     if (trangThai) query.trangThai = trangThai;
+    if (idNguoiCungCap) query.idNguoiCungCap = idNguoiCungCap;
 
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
@@ -113,7 +116,7 @@ export const createDichVu = async (
     }
 
     const hinhAnh = req.files
-      ? (req.files as Express.Multer.File[]).map((file) => file.path)
+      ? (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path))
       : [];
 
     const dichVu: any = await DichVu.create({
@@ -121,6 +124,11 @@ export const createDichVu = async (
       hinhAnh,
       idNguoiCungCap: userId,
     });
+
+    // Gắn vai trò "nhà cung cấp dịch vụ" để mở khóa Dashboard Dịch Vụ
+    if (!user.vaiTroPhu?.includes('nhaProviderDichVu')) {
+      await User.findByIdAndUpdate(userId, { $addToSet: { vaiTroPhu: 'nhaProviderDichVu' } });
+    }
 
     const dichVuObj = dichVu.toObject();
     const dichVuData = {
@@ -151,7 +159,7 @@ export const updateDichVu = async (
     let updateData: any = { ...req.body };
 
     if (req.files && (req.files as Express.Multer.File[]).length > 0) {
-      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => file.path);
+      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path));
     }
 
     const dichVu: any = await DichVu.findByIdAndUpdate(req.params.id, updateData, {

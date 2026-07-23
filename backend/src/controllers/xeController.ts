@@ -3,6 +3,7 @@ import Xe from '../models/Xe';
 import User from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { toWebPath } from '../middleware/upload';
 
 export const getAllXe = async (
   req: Request,
@@ -20,6 +21,7 @@ export const getAllXe = async (
       namSanXuat,
       soCho,
       trangThai,
+      idChuXe,
     } = req.query;
 
     const query: any = {};
@@ -32,6 +34,7 @@ export const getAllXe = async (
     if (namSanXuat) query.namSanXuat = parseInt(namSanXuat as string);
     if (soCho) query.soCho = parseInt(soCho as string);
     if (trangThai) query.trangThai = trangThai;
+    if (idChuXe) query.idChuXe = idChuXe;
 
     if (giaTu || giaDen) {
       query.gia = {};
@@ -129,7 +132,7 @@ export const createXe = async (
     }
 
     const hinhAnh = req.files
-      ? (req.files as Express.Multer.File[]).map((file) => file.path)
+      ? (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path))
       : [];
 
     const xe: any = await Xe.create({
@@ -137,6 +140,11 @@ export const createXe = async (
       hinhAnh,
       idChuXe: userId, // Lưu ID chủ xe
     });
+
+    // Gắn vai trò "người bán" để mở khóa Dashboard Bán Xe
+    if (!user.vaiTroPhu?.includes('nguoiBan')) {
+      await User.findByIdAndUpdate(userId, { $addToSet: { vaiTroPhu: 'nguoiBan' } });
+    }
 
     // Transform _id to id for frontend
     const xeObj = xe.toObject();
@@ -168,7 +176,7 @@ export const updateXe = async (
     let updateData: any = { ...req.body };
 
     if (req.files && (req.files as Express.Multer.File[]).length > 0) {
-      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => file.path);
+      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path));
     }
 
     const xe: any = await Xe.findByIdAndUpdate(req.params.id, updateData, {

@@ -3,6 +3,7 @@ import DonHang from '../models/DonHang';
 import Xe from '../models/Xe';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { toWebPath } from '../middleware/upload';
 import { giuTienEscrow, traTienNguoiBan } from './walletController';
 
 export const createDonHang = async (
@@ -32,6 +33,11 @@ export const createDonHang = async (
 
     if (xe.trangThai !== 'dangBan') {
       next(createError('Xe không còn bán', 400));
+      return;
+    }
+
+    if (xe.idChuXe && xe.idChuXe.toString() === req.user!.id) {
+      next(createError('Không thể mua xe của chính mình', 400));
       return;
     }
 
@@ -120,11 +126,18 @@ export const getDonHangById = async (
     }
 
     // Check if user is authorized to view this order
-    const idKhachHang = donHangDoc.idKhachHang?._id 
-      ? donHangDoc.idKhachHang._id.toString() 
+    const idKhachHang = donHangDoc.idKhachHang?._id
+      ? donHangDoc.idKhachHang._id.toString()
       : donHangDoc.idKhachHang.toString();
-      
-    if (req.user?.vaiTro !== 'admin' && idKhachHang !== req.user?.id) {
+
+    const xe: any = donHangDoc.idXe;
+    const idChuXe = xe?.idChuXe ? xe.idChuXe.toString() : null;
+
+    const laAdmin = req.user?.vaiTro === 'admin';
+    const laNguoiMua = idKhachHang === req.user?.id;
+    const laNguoiBan = idChuXe !== null && idChuXe === req.user?.id;
+
+    if (!laAdmin && !laNguoiMua && !laNguoiBan) {
       next(createError('Bạn không có quyền xem đơn hàng này', 403));
       return;
     }
@@ -196,6 +209,128 @@ export const getAllDonHang = async (
   }
 };
 
+// Lấy danh sách đơn hàng của các xe do người bán hiện tại đăng
+export const getDonHangNguoiBan = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+
+    const xeCuaToi = await Xe.find({ idChuXe: userId }).select('_id');
+    const idXeList = xeCuaToi.map((xe) => xe._id);
+
+    const donHangList = await DonHang.find({ idXe: { $in: idXeList } })
+      .populate('idKhachHang', 'ten email sdt')
+      .populate('idXe')
+      .sort({ createdAt: -1 });
+
+    const donHang = donHangList.map((item: any) => {
+      const obj = item.toObject();
+      return {
+        ...obj,
+        id: obj._id?.toString() || '',
+      };
+    });
+
+    res.json({
+      success: true,
+      data: { donHang },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Người bán xác nhận đồng ý bán (chấp nhận đơn hàng mới)
+export const nguoiBanXacNhanDonHang = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.id;
+
+    const donHang: any = await DonHang.findById(id).populate('idXe');
+    if (!donHang) {
+      next(createError('Không tìm thấy đơn hàng', 404));
+      return;
+    }
+
+    const xe: any = donHang.idXe;
+    if (!xe || !xe.idChuXe || xe.idChuXe.toString() !== userId) {
+      next(createError('Bạn không có quyền xác nhận đơn hàng này', 403));
+      return;
+    }
+
+    if (donHang.trangThai !== 'choNguoiBanXacNhan') {
+      next(createError('Đơn hàng này không ở trạng thái chờ xác nhận', 400));
+      return;
+    }
+
+    donHang.trangThai = 'nguoiBanDaXacNhan';
+    donHang.ngayXacNhan = new Date();
+    await donHang.save();
+
+    res.json({
+      success: true,
+      message: 'Đã xác nhận đơn hàng thành công',
+      data: { donHang },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Người bán từ chối đơn hàng mới
+export const nguoiBanTuChoiDonHang = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { lyDo } = req.body;
+    const userId = req.user!.id;
+
+    const donHang: any = await DonHang.findById(id).populate('idXe');
+    if (!donHang) {
+      next(createError('Không tìm thấy đơn hàng', 404));
+      return;
+    }
+
+    const xe: any = donHang.idXe;
+    if (!xe || !xe.idChuXe || xe.idChuXe.toString() !== userId) {
+      next(createError('Bạn không có quyền từ chối đơn hàng này', 403));
+      return;
+    }
+
+    if (donHang.trangThai !== 'choNguoiBanXacNhan') {
+      next(createError('Đơn hàng này không ở trạng thái chờ xác nhận', 400));
+      return;
+    }
+
+    donHang.trangThai = 'daHuy';
+    donHang.nguoiHuy = 'nguoiBan';
+    donHang.lyDoHuy = lyDo || 'Người bán từ chối đơn hàng';
+    await donHang.save();
+
+    // Mở lại xe cho khách khác đặt mua
+    xe.trangThai = 'dangBan';
+    await xe.save();
+
+    res.json({
+      success: true,
+      message: 'Đã từ chối đơn hàng',
+      data: { donHang },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateTrangThaiDonHang = async (
   req: AuthRequest,
   res: Response,
@@ -260,7 +395,7 @@ export const uploadBienLai = async (
     }
 
     // Lưu đường dẫn file
-    donHang.bienLaiChuyenKhoan = req.file.path;
+    donHang.bienLaiChuyenKhoan = toWebPath(req.file.path);
     donHang.trangThai = 'choXacNhanThanhToan';
     await donHang.save();
 
@@ -300,9 +435,14 @@ export const nguoiBanXacNhanGiaoXe = async (
       return;
     }
 
-    // Kiểm tra quyền (chỉ người bán)
-    // TODO: Thêm logic kiểm tra idNguoiBan từ model Xe
-    
+    // Kiểm tra quyền (chỉ người bán của xe trong đơn hàng)
+    const xe: any = donHang.idXe;
+    const idNguoiBanXe = xe?.idChuXe ? xe.idChuXe.toString() : null;
+    if (!idNguoiBanXe || idNguoiBanXe !== userId) {
+      next(createError('Bạn không có quyền thực hiện', 403));
+      return;
+    }
+
     donHang.nguoiBanXacNhanGiaoXe = true;
     donHang.trangThai = 'dangGiao';
     await donHang.save();

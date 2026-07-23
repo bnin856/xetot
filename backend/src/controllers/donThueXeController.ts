@@ -36,12 +36,25 @@ export const getDonThueXeById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const donThueXe = await DonThueXe.findById(req.params.id)
+    const donThueXe: any = await DonThueXe.findById(req.params.id)
       .populate('idKhachHang', 'ten email sdt diaChi')
-      .populate('idXeChoThue', 'tenXe hangXe hinhAnh giaThueNgay giaThueThang');
+      .populate('idXeChoThue', 'tenXe hangXe hinhAnh giaThueNgay giaThueThang idChuXe');
 
     if (!donThueXe) {
       next(createError('Không tìm thấy đơn thuê xe', 404));
+      return;
+    }
+
+    const userId = req.user?.id;
+    const idKhachHang = donThueXe.idKhachHang?._id ? donThueXe.idKhachHang._id.toString() : donThueXe.idKhachHang.toString();
+    const idChuXe = donThueXe.idXeChoThue?.idChuXe ? donThueXe.idXeChoThue.idChuXe.toString() : null;
+
+    const laAdmin = req.user?.vaiTro === 'admin';
+    const laKhachThue = idKhachHang === userId;
+    const laChuXe = idChuXe !== null && idChuXe === userId;
+
+    if (!laAdmin && !laKhachThue && !laChuXe) {
+      next(createError('Bạn không có quyền xem đơn thuê xe này', 403));
       return;
     }
 
@@ -69,6 +82,38 @@ export const getDonThueXeByUserId = async (
     }
 
     const donThueXe = await DonThueXe.find({ idKhachHang: userId })
+      .populate('idXeChoThue', 'tenXe hangXe hinhAnh giaThueNgay giaThueThang')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: donThueXe.length,
+      data: donThueXe,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get rental orders for cars owned by the current user (rental owner)
+export const getDonThueXeNguoiChoThue = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      next(createError('Vui lòng đăng nhập', 401));
+      return;
+    }
+
+    const xeCuaToi = await XeChoThue.find({ idChuXe: userId }).select('_id');
+    const idXeList = xeCuaToi.map((xe) => xe._id);
+
+    const donThueXe = await DonThueXe.find({ idXeChoThue: { $in: idXeList } })
+      .populate('idKhachHang', 'ten email sdt')
       .populate('idXeChoThue', 'tenXe hangXe hinhAnh giaThueNgay giaThueThang')
       .sort({ createdAt: -1 });
 
@@ -119,6 +164,11 @@ export const createDonThueXe = async (
 
     if (xe.trangThai !== 'sanSang') {
       next(createError('Xe không khả dụng để thuê', 400));
+      return;
+    }
+
+    if (xe.idChuXe && xe.idChuXe.toString() === userId) {
+      next(createError('Không thể thuê xe của chính mình', 400));
       return;
     }
 

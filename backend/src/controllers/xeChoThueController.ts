@@ -3,6 +3,7 @@ import XeChoThue from '../models/XeChoThue';
 import User from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { toWebPath } from '../middleware/upload';
 
 export const getAllXeChoThue = async (
   req: Request,
@@ -18,6 +19,7 @@ export const getAllXeChoThue = async (
       loaiXe,
       soCho,
       trangThai,
+      idChuXe,
     } = req.query;
 
     const query: any = {};
@@ -30,6 +32,7 @@ export const getAllXeChoThue = async (
     if (loaiXe) query.loaiXe = loaiXe;
     if (soCho) query.soCho = parseInt(soCho as string);
     if (trangThai) query.trangThai = trangThai;
+    if (idChuXe) query.idChuXe = idChuXe;
 
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
@@ -118,7 +121,7 @@ export const createXeChoThue = async (
     }
 
     const hinhAnh = req.files
-      ? (req.files as Express.Multer.File[]).map((file) => file.path)
+      ? (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path))
       : [];
 
     const xe: any = await XeChoThue.create({
@@ -126,6 +129,11 @@ export const createXeChoThue = async (
       hinhAnh,
       idChuXe: userId,
     });
+
+    // Gắn vai trò "người cho thuê" để mở khóa Dashboard Cho Thuê
+    if (!user.vaiTroPhu?.includes('nguoiChoThue')) {
+      await User.findByIdAndUpdate(userId, { $addToSet: { vaiTroPhu: 'nguoiChoThue' } });
+    }
 
     const xeObj = xe.toObject();
     const xeData = {
@@ -156,7 +164,7 @@ export const updateXeChoThue = async (
     let updateData: any = { ...req.body };
 
     if (req.files && (req.files as Express.Multer.File[]).length > 0) {
-      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => file.path);
+      updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path));
     }
 
     const xe: any = await XeChoThue.findByIdAndUpdate(req.params.id, updateData, {

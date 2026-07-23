@@ -31,6 +31,11 @@ export const datLich = async (
       return;
     }
 
+    if (dichVu.idNguoiCungCap.toString() === userId) {
+      next(createError('Không thể đặt lịch dịch vụ của chính mình', 400));
+      return;
+    }
+
     // Kiểm tra ngày phải trong tương lai
     const selectedDate = new Date(ngayDat);
     if (selectedDate < new Date()) {
