@@ -184,27 +184,27 @@ const TinNhan: React.FC = () => {
                 {filteredConversations.map((conversation) => {
                   const otherUser = getOtherUser(conversation);
                   const unreadCount = getUnreadCount(conversation);
-                  const xeDaXoa = typeof conversation.idXe !== 'object';
+                  const xe = typeof conversation.idXe === 'object' ? conversation.idXe : null;
 
                   return (
                     <motion.div
                       key={conversation._id}
                       whileHover={{ scale: 1.01 }}
-                      onClick={() => !xeDaXoa && setSelectedConversation(conversation)}
-                      className={`card p-4 transition-all ${xeDaXoa ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg'}`}
+                      onClick={() => xe && setSelectedConversation(conversation)}
+                      className={`card p-4 transition-all ${!xe ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg'}`}
                     >
                       <div className="flex gap-4">
                         {/* Xe Image */}
                         <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                          {!xeDaXoa && conversation.idXe.hinhAnh && conversation.idXe.hinhAnh.length > 0 ? (
+                          {xe && xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                             <img
-                              src={getImageUrl(conversation.idXe.hinhAnh[0])}
-                              alt={conversation.idXe.tenXe}
+                              src={getImageUrl(xe.hinhAnh[0])}
+                              alt={xe.tenXe}
                               className="w-full h-full object-cover"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center px-1">
-                              {xeDaXoa ? 'Tin đã bị xóa' : 'No image'}
+                              {!xe ? 'Tin đã bị xóa' : 'No image'}
                             </div>
                           )}
                         </div>
@@ -213,7 +213,7 @@ const TinNhan: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-1">
                             <h3 className="font-semibold text-lg truncate">
-                              {xeDaXoa ? 'Xe/tin đăng đã bị xóa' : conversation.idXe.tenXe}
+                              {!xe ? 'Xe/tin đăng đã bị xóa' : xe.tenXe}
                             </h3>
                             {unreadCount > 0 && (
                               <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">
@@ -222,9 +222,9 @@ const TinNhan: React.FC = () => {
                             )}
                           </div>
 
-                          {!xeDaXoa && (
+                          {xe && (
                             <p className="text-primary-600 font-semibold mb-2">
-                              {formatPrice(conversation.idXe.gia)}
+                              {formatPrice(xe.gia)}
                             </p>
                           )}
 
