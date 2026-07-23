@@ -34,8 +34,12 @@ const DangNhap: React.FC = () => {
       } else {
         navigate('/');
       }
-    } catch (err) {
-      setError('Email hoặc mật khẩu không đúng');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(
+        err.response?.data?.error?.message ||
+        (err.request && !err.response ? 'Không kết nối được tới server, vui lòng thử lại sau' : 'Email hoặc mật khẩu không đúng')
+      );
     }
   };
 

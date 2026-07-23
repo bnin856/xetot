@@ -97,8 +97,14 @@ const DangKy: React.FC = () => {
     try {
       await register(formData);
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
+      setErrors({
+        ...errors,
+        submit:
+          error.response?.data?.error?.message ||
+          (error.request && !error.response ? 'Không kết nối được tới server, vui lòng thử lại sau' : 'Đăng ký thất bại, vui lòng thử lại'),
+      });
     }
   };
 
@@ -114,7 +120,13 @@ const DangKy: React.FC = () => {
             <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
               Đăng ký tài khoản
             </h2>
-            
+
+            {errors.submit && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                {errors.submit}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
