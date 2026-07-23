@@ -78,7 +78,7 @@ export const getXeChoThueById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const xe: any = await XeChoThue.findById(req.params.id);
+    const xe: any = await XeChoThue.findById(req.params.id).populate('idChuXe', 'ten email sdt');
 
     if (!xe) {
       next(createError('Không tìm thấy xe', 404));
@@ -167,10 +167,22 @@ export const updateXeChoThue = async (
       updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path));
     }
 
+    const existing = await XeChoThue.findById(req.params.id);
+    if (!existing) {
+      next(createError('Không tìm thấy xe', 404));
+      return;
+    }
+
+    // Tự vá dữ liệu cũ thiếu chủ xe (VD: xe được thêm trực tiếp vào DB, không qua API)
+    // để mở lại được nút Chat/Gọi điện/Thông tin chủ xe ở trang chi tiết
+    if (!existing.idChuXe && req.user?.id) {
+      updateData.idChuXe = req.user.id;
+    }
+
     const xe: any = await XeChoThue.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
-    });
+    }).populate('idChuXe', 'ten email sdt');
 
     if (!xe) {
       next(createError('Không tìm thấy xe', 404));
