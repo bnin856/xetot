@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Car, Calendar, DollarSign, Users, Filter, Search } from 'lucide-react';
+import { Car, Calendar, DollarSign, Users, Search, SlidersHorizontal } from 'lucide-react';
 import MainLayout from '../../components/Layout/MainLayout';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import xeChoThueService from '../../services/xeChoThueService';
 import HotSearchDropdown from '../../components/HotSearchDropdown';
 import { getImageUrl } from '../../utils/image';
@@ -28,6 +28,8 @@ const ThueXe: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHotSearch, setShowHotSearch] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [sapXep, setSapXep] = useState('macDinh');
   const [filters, setFilters] = useState({
     hangXe: '',
     loaiXe: '',
@@ -60,6 +62,62 @@ const ThueXe: React.FC = () => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
   };
+
+  const FilterContent = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-2">Hãng xe</label>
+        <select
+          value={filters.hangXe}
+          onChange={(e) => setFilters({ ...filters, hangXe: e.target.value })}
+          className="input-field"
+        >
+          <option value="">Tất cả</option>
+          <option value="Toyota">Toyota</option>
+          <option value="Honda">Honda</option>
+          <option value="Ford">Ford</option>
+          <option value="Mazda">Mazda</option>
+          <option value="Mercedes-Benz">Mercedes-Benz</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">Loại xe</label>
+        <select
+          value={filters.loaiXe}
+          onChange={(e) => setFilters({ ...filters, loaiXe: e.target.value })}
+          className="input-field"
+        >
+          <option value="">Tất cả</option>
+          <option value="Sedan">Sedan</option>
+          <option value="SUV">SUV</option>
+          <option value="MPV">MPV</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">Số chỗ</label>
+        <select
+          value={filters.soCho}
+          onChange={(e) => setFilters({ ...filters, soCho: e.target.value })}
+          className="input-field"
+        >
+          <option value="">Tất cả</option>
+          <option value="4">4 chỗ</option>
+          <option value="5">5 chỗ</option>
+          <option value="7">7 chỗ</option>
+        </select>
+      </div>
+
+      <button className="w-full btn-primary">Áp dụng bộ lọc</button>
+      <button
+        onClick={() => setFilters({ hangXe: '', loaiXe: '', soCho: '' })}
+        className="w-full btn-secondary"
+      >
+        Xóa bộ lọc
+      </button>
+    </div>
+  );
 
   return (
     <MainLayout>
@@ -116,75 +174,69 @@ const ThueXe: React.FC = () => {
         </section>
 
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filters Sidebar */}
-            <aside className="lg:col-span-1">
+          {/* Breadcrumb */}
+          <div className="mb-6 text-sm text-gray-600">
+            <Link to="/" className="hover:text-primary-600">Trang chủ</Link>
+            <span className="mx-2">/</span>
+            <span>Thuê xe</span>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Sidebar Filters */}
+            <motion.aside
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="lg:w-64 flex-shrink-0"
+            >
               <div className="card p-6 sticky top-24">
-                <div className="flex items-center space-x-2 mb-6">
-                  <Filter className="w-5 h-5 text-primary-600" />
-                  <h2 className="text-xl font-semibold">Bộ lọc</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Hãng xe</label>
-                    <select
-                      value={filters.hangXe}
-                      onChange={(e) => setFilters({ ...filters, hangXe: e.target.value })}
-                      className="input-field"
-                    >
-                      <option value="">Tất cả</option>
-                      <option value="Toyota">Toyota</option>
-                      <option value="Honda">Honda</option>
-                      <option value="Ford">Ford</option>
-                      <option value="Mazda">Mazda</option>
-                      <option value="Mercedes-Benz">Mercedes-Benz</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Loại xe</label>
-                    <select
-                      value={filters.loaiXe}
-                      onChange={(e) => setFilters({ ...filters, loaiXe: e.target.value })}
-                      className="input-field"
-                    >
-                      <option value="">Tất cả</option>
-                      <option value="Sedan">Sedan</option>
-                      <option value="SUV">SUV</option>
-                      <option value="MPV">MPV</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Số chỗ</label>
-                    <select
-                      value={filters.soCho}
-                      onChange={(e) => setFilters({ ...filters, soCho: e.target.value })}
-                      className="input-field"
-                    >
-                      <option value="">Tất cả</option>
-                      <option value="4">4 chỗ</option>
-                      <option value="5">5 chỗ</option>
-                      <option value="7">7 chỗ</option>
-                    </select>
-                  </div>
-
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg">Bộ lọc</h3>
                   <button
-                    onClick={() => setFilters({ hangXe: '', loaiXe: '', soCho: '' })}
-                    className="w-full btn-secondary"
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="lg:hidden"
                   >
-                    Xóa bộ lọc
+                    <SlidersHorizontal className="w-5 h-5" />
                   </button>
                 </div>
+
+                <div className="hidden lg:block">
+                  <FilterContent />
+                </div>
+
+                <AnimatePresence>
+                  {showFilters && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="lg:hidden"
+                    >
+                      <FilterContent />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </aside>
+            </motion.aside>
 
             {/* Cars List */}
-            <div className="lg:col-span-3">
+            <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Danh sách xe cho thuê</h2>
-                <span className="text-gray-600">{danhSachXe.length} xe</span>
+                <h2 className="text-2xl font-bold">
+                  Tìm thấy {danhSachXe.length} xe cho thuê phù hợp
+                </h2>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Sắp xếp:</span>
+                  <select
+                    value={sapXep}
+                    onChange={(e) => setSapXep(e.target.value)}
+                    className="input-field w-auto"
+                  >
+                    <option value="macDinh">Mặc định</option>
+                    <option value="giaTang">Giá tăng dần</option>
+                    <option value="giaGiam">Giá giảm dần</option>
+                    <option value="moiNhat">Mới nhất</option>
+                  </select>
+                </div>
               </div>
 
               {loading ? (
@@ -198,13 +250,14 @@ const ThueXe: React.FC = () => {
                   <p className="text-sm text-gray-500">Vui lòng quay lại sau</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {danhSachXe.map((xe, index) => (
                     <motion.div
                       key={xe._id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ y: -5 }}
                       className="card overflow-hidden"
                     >
                       <div className="h-48 bg-gray-200 relative">
@@ -219,7 +272,7 @@ const ThueXe: React.FC = () => {
                             <Car className="w-16 h-16" />
                           </div>
                         )}
-                        <div className="absolute top-2 left-2 bg-accent-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div className="absolute top-2 left-2 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                           {xe.trangThai === 'sanSang' ? 'Sẵn sàng' : 'Đang thuê'}
                         </div>
                       </div>
