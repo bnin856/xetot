@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 // Sử dụng relative path để Vite proxy hoạt động trong development
-// Trong production, có thể set VITE_API_URL để trỏ đến production API
-const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
+// Trong production, set VITE_API_URL = origin của backend (VD: https://xetot-backend.onrender.com)
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/v1`
+  : '/api/v1';
 
 const api = axios.create({
   baseURL: API_URL,

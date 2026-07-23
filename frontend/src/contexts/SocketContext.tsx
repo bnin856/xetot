@@ -26,9 +26,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     // Kết nối Socket.io
-    // Trong development, Vite proxy sẽ xử lý /socket.io
-    // Trong production, cần set VITE_API_URL để trỏ đến production server
-    const socketUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'http://localhost:5000');
+    // Trong development, Vite proxy sẽ xử lý /socket.io nên để trống ('')
+    // Trong production, VITE_API_URL = origin của backend (VD: https://xetot-backend.onrender.com)
+    const socketUrl = import.meta.env.VITE_API_URL || '';
     const newSocket = io(socketUrl, {
       auth: {
         token,
