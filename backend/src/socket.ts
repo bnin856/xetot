@@ -2,10 +2,21 @@ import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { sendMessage } from './controllers/chatController';
+import Conversation from './models/Conversation';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
 }
+
+// Chỉ người mua hoặc người bán trong cuộc trò chuyện mới được join/gửi tin nhắn vào đó
+const isConversationMember = async (conversationId: string, userId: string): Promise<boolean> => {
+  const conversation = await Conversation.findById(conversationId);
+  if (!conversation) return false;
+  return (
+    conversation.idNguoiMua.toString() === userId ||
+    conversation.idNguoiBan.toString() === userId
+  );
+};
 
 export const initializeSocket = (server: HttpServer) => {
   const io = new SocketIOServer(server, {
@@ -43,7 +54,12 @@ export const initializeSocket = (server: HttpServer) => {
     }
 
     // Join conversation room
-    socket.on('join_conversation', (conversationId: string) => {
+    socket.on('join_conversation', async (conversationId: string) => {
+      const allowed = await isConversationMember(conversationId, socket.userId!);
+      if (!allowed) {
+        socket.emit('message_error', { error: 'Bạn không phải thành viên của cuộc trò chuyện này' });
+        return;
+      }
       socket.join(`conversation:${conversationId}`);
       console.log(`User ${socket.userId} joined conversation ${conversationId}`);
     });
@@ -62,6 +78,12 @@ export const initializeSocket = (server: HttpServer) => {
       hinhAnh?: string[];
     }) => {
       try {
+        const allowed = await isConversationMember(data.idConversation, socket.userId!);
+        if (!allowed) {
+          socket.emit('message_error', { error: 'Bạn không phải thành viên của cuộc trò chuyện này' });
+          return;
+        }
+
         const result = await sendMessage(
           data.idConversation,
           socket.userId!,
