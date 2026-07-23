@@ -75,23 +75,25 @@ export const getOrCreateConversation = async (
     }
 
     // Populate xe thủ công vì có thể là Xe hoặc XeChoThue (cho cả conversation cũ và mới)
-    if (conversation.loaiXe === 'xeChoThue') {
-      const xeChoThue = await XeChoThue.findById(conversation.idXe).select('tenXe hinhAnh giaThueTheoNgay');
+    // Dùng toObject() vì idXe trong schema là ObjectId thuần (không có ref) -
+    // gán thẳng object vào field kiểu ObjectId trên Mongoose document sẽ bị ép kiểu
+    // ngược lại thành chuỗi ID khi serialize, làm mất tenXe/gia/hinhAnh.
+    const conversationObj: any = conversation.toObject();
+    if (conversationObj.loaiXe === 'xeChoThue') {
+      const xeChoThue: any = await XeChoThue.findById(conversationObj.idXe).select('tenXe hinhAnh giaThueTheoNgay');
       if (xeChoThue) {
-        conversation.idXe = xeChoThue as any;
-        // Map giaThueTheoNgay thành gia để frontend dùng chung
-        (conversation.idXe as any).gia = (xeChoThue as any).giaThueTheoNgay;
+        conversationObj.idXe = { ...xeChoThue.toObject(), gia: xeChoThue.giaThueTheoNgay };
       }
     } else {
-      const xe = await Xe.findById(conversation.idXe).select('tenXe hinhAnh gia');
+      const xe = await Xe.findById(conversationObj.idXe).select('tenXe hinhAnh gia');
       if (xe) {
-        conversation.idXe = xe as any;
+        conversationObj.idXe = xe.toObject();
       }
     }
 
     res.json({
       success: true,
-      data: { conversation },
+      data: { conversation: conversationObj },
     });
   } catch (error) {
     next(error);
@@ -115,28 +117,35 @@ export const getMyConversations = async (
       .sort({ lastMessageAt: -1 });
 
     // Populate xe thủ công vì có thể là Xe hoặc XeChoThue
-    for (let conv of conversations) {
-      if (!conv.idXe) continue; // Skip if no idXe
-      
-      const loaiXe = conv.loaiXe || 'xe'; // Default to 'xe' if not set
+    // Dùng toObject() vì idXe trong schema là ObjectId thuần (không có ref) -
+    // gán thẳng object vào field kiểu ObjectId trên Mongoose document sẽ bị ép kiểu
+    // ngược lại thành chuỗi ID khi serialize, làm mất tenXe/gia/hinhAnh.
+    const conversationsData: any[] = [];
+    for (const conv of conversations) {
+      const convObj: any = conv.toObject();
+      if (!convObj.idXe) {
+        conversationsData.push(convObj);
+        continue;
+      }
+
+      const loaiXe = convObj.loaiXe || 'xe'; // Default to 'xe' if not set
       if (loaiXe === 'xeChoThue') {
-        const xeChoThue = await XeChoThue.findById(conv.idXe).select('tenXe hinhAnh giaThueTheoNgay');
+        const xeChoThue: any = await XeChoThue.findById(convObj.idXe).select('tenXe hinhAnh giaThueTheoNgay');
         if (xeChoThue) {
-          conv.idXe = xeChoThue as any;
-          // Map giaThueTheoNgay thành gia để frontend dùng chung
-          (conv.idXe as any).gia = (xeChoThue as any).giaThueTheoNgay;
+          convObj.idXe = { ...xeChoThue.toObject(), gia: xeChoThue.giaThueTheoNgay };
         }
       } else {
-        const xe = await Xe.findById(conv.idXe).select('tenXe hinhAnh gia');
+        const xe = await Xe.findById(convObj.idXe).select('tenXe hinhAnh gia');
         if (xe) {
-          conv.idXe = xe as any;
+          convObj.idXe = xe.toObject();
         }
       }
+      conversationsData.push(convObj);
     }
 
     res.json({
       success: true,
-      data: { conversations },
+      data: { conversations: conversationsData },
     });
   } catch (error) {
     next(error);
