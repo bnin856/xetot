@@ -111,4 +111,11 @@ cd frontend && npm run build && npm run preview
 
 ## Tài liệu bổ sung
 
-Xem thêm các hướng dẫn chi tiết theo tính năng ở thư mục gốc: `ESCROW_TESTING_GUIDE.md`, `WALLET_DASHBOARD_GUIDE.md`, `HOT_SEARCH_GUIDE.md`, `CHAT_DEBUG_GUIDE.md`, `XAC_NHAN_VA_TRANH_CHAP_DON_HANG_GUIDE.md`, `QUY_TRINH_ESCROW_CHUYEN_KHOAN.md`, `HUONG_DAN_DANG_BAN_THUE_DICH_VU.md`.
+Xem thêm các hướng dẫn chi tiết theo tính năng trong thư mục [`docs/`](docs/):
+
+- [Quy trình Escrow & hướng dẫn test](docs/ESCROW_TESTING_GUIDE.md)
+- [Quy trình Escrow cho chuyển khoản online](docs/QUY_TRINH_ESCROW_CHUYEN_KHOAN.md)
+- [Ví điện tử & Dashboard](docs/WALLET_DASHBOARD_GUIDE.md)
+- [Xác nhận & tranh chấp đơn hàng](docs/XAC_NHAN_VA_TRANH_CHAP_DON_HANG_GUIDE.md)
+- [Đăng bán/cho thuê xe & đăng ký dịch vụ](docs/HUONG_DAN_DANG_BAN_THUE_DICH_VU.md)
+- [Tính năng Hot Search](docs/HOT_SEARCH_GUIDE.md)
