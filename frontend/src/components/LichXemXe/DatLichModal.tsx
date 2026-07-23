@@ -47,7 +47,7 @@ const DatLichModal: React.FC<DatLichModalProps> = ({ idXe, tenXe, onClose }) => 
       onClose();
     } catch (error: any) {
       console.error('Error:', error);
-      alert(error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra khi đặt lịch');
     } finally {
       setLoading(false);
     }

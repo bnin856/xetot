@@ -76,7 +76,7 @@ const XacThucTaiKhoan: React.FC = () => {
       // Refresh user data để cập nhật trạng thái xác thực
       await refreshUser();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     } finally {
       setSubmitting(false);
     }

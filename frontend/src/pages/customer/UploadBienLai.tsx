@@ -61,7 +61,7 @@ const UploadBienLai: React.FC = () => {
       alert('Upload biên lai thành công! Chờ người bán xác nhận.');
       navigate(`/customer/don-hang/${id}`);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     } finally {
       setUploading(false);
     }

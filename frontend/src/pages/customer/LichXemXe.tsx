@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import lichXemXeService, { LichXemXe } from '../../services/lichXemXeService';
 import { useAuth } from '../../contexts/AuthContext';
 import { xeService } from '../../services/xeService';
+import { getImageUrl } from '../../utils/image';
 import xeChoThueService from '../../services/xeChoThueService';
 
 const LichXemXePage: React.FC = () => {
@@ -83,7 +84,7 @@ const LichXemXePage: React.FC = () => {
       alert('Đã duyệt lịch xem xe');
       fetchLichXemXe();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -101,7 +102,7 @@ const LichXemXePage: React.FC = () => {
       setLyDoHuy('');
       fetchLichXemXe();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -113,7 +114,7 @@ const LichXemXePage: React.FC = () => {
       alert('Đã đánh dấu hoàn thành');
       fetchLichXemXe();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -154,7 +155,7 @@ const LichXemXePage: React.FC = () => {
       fetchLichXemXe();
     } catch (error: any) {
       console.error('Error:', error);
-      alert(error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra khi đặt lịch');
     } finally {
       setLoading(false);
     }
@@ -297,7 +298,7 @@ const LichXemXePage: React.FC = () => {
                       <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                         {lich.idXe.hinhAnh && lich.idXe.hinhAnh.length > 0 ? (
                           <img
-                            src={`http://localhost:5000/${lich.idXe.hinhAnh[0]}`}
+                            src={getImageUrl(lich.idXe.hinhAnh[0])}
                             alt={lich.idXe.tenXe}
                             className="w-full h-full object-cover"
                           />

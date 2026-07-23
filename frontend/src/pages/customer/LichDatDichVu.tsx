@@ -4,6 +4,7 @@ import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import lichDatDichVuService, { LichDatDichVu } from '../../services/lichDatDichVuService';
 import { useAuth } from '../../contexts/AuthContext';
+import { getImageUrl } from '../../utils/image';
 
 const LichDatDichVuPage: React.FC = () => {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ const LichDatDichVuPage: React.FC = () => {
       alert('Đã duyệt lịch đặt dịch vụ');
       fetchLichDat();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -56,7 +57,7 @@ const LichDatDichVuPage: React.FC = () => {
       setLyDoHuy('');
       fetchLichDat();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -68,7 +69,7 @@ const LichDatDichVuPage: React.FC = () => {
       alert('Đã đánh dấu hoàn thành');
       fetchLichDat();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -188,7 +189,7 @@ const LichDatDichVuPage: React.FC = () => {
                       <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 flex items-center justify-center">
                         {lich.idDichVu.hinhAnh && lich.idDichVu.hinhAnh.length > 0 ? (
                           <img
-                            src={`http://localhost:5000/${lich.idDichVu.hinhAnh[0]}`}
+                            src={getImageUrl(lich.idDichVu.hinhAnh[0])}
                             alt={lich.idDichVu.tenDichVu}
                             className="w-full h-full object-cover"
                           />

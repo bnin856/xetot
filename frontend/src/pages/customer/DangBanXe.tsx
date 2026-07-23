@@ -117,7 +117,7 @@ const DangBanXe: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error:', error);
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi đăng bán xe';
+      const errorMessage = error.response?.data?.error?.message || 'Có lỗi xảy ra khi đăng bán xe';
       
       // Kiểm tra nếu lỗi là chưa xác thực KYC
       if (error.response?.status === 403 && errorMessage.includes('xác thực')) {

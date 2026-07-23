@@ -53,7 +53,7 @@ const DatLichDichVuModal: React.FC<DatLichDichVuModalProps> = ({ idDichVu, tenDi
       }, 3000);
     } catch (error: any) {
       console.error('Error:', error);
-      alert(error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch');
+      alert(error.response?.data?.error?.message || 'Có lỗi xảy ra khi đặt lịch');
       setLoading(false);
     }
   };

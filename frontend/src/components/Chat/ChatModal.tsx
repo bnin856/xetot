@@ -82,7 +82,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ idXe, tenXe, loaiXe = 'xe', onClo
         status: error.response?.status,
       });
       
-      const errorMessage = error.response?.data?.message || error.message || 'Không thể tải hội thoại';
+      const errorMessage = error.response?.data?.error?.message || error.message || 'Không thể tải hội thoại';
       
       // Không đóng modal, chỉ hiển thị lỗi
       alert(`Lỗi: ${errorMessage}\n\nVui lòng kiểm tra:\n- Đã đăng nhập chưa?\n- Backend đang chạy không?\n- Console để xem chi tiết lỗi`);
