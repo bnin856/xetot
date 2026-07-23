@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import { CreditCard, MapPin, FileText, Calculator, TrendingUp, Info } from 'lucide-react';
+import { CreditCard, MapPin, FileText, Calculator, TrendingUp, Info, ArrowLeft, AlertCircle } from 'lucide-react';
 import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -225,6 +225,27 @@ const DatMuaXe: React.FC = () => {
       <MainLayout>
         <div className="page-container py-8">
           <div className="container-custom max-w-4xl">
+            {/* Breadcrumb */}
+            <nav className="flex items-center space-x-2 text-sm mb-6">
+              <Link to="/" className="text-gray-600 hover:text-primary-600">
+                Trang chủ
+              </Link>
+              <span className="text-gray-400">/</span>
+              <Link to="/tim-kiem" className="text-gray-600 hover:text-primary-600">
+                Tìm kiếm
+              </Link>
+              {xe && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <Link to={`/xe/${xe.id}`} className="text-gray-600 hover:text-primary-600">
+                    {xe.tenXe}
+                  </Link>
+                </>
+              )}
+              <span className="text-gray-400">/</span>
+              <span className="text-primary-600 font-medium">Đặt mua</span>
+            </nav>
+
             <h1 className="text-3xl font-bold mb-8">Đặt mua xe</h1>
 
           {loading ? (
@@ -393,7 +414,23 @@ const DatMuaXe: React.FC = () => {
                   <span className="text-primary-600">{formatPrice(fees.total)}</span>
                 </div>
               </div>
-              
+
+              {/* Terms */}
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div className="flex items-start">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5 mr-3" />
+                  <div className="text-sm text-yellow-800">
+                    <p className="font-medium mb-1">Lưu ý khi mua xe:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>Kiểm tra kỹ tình trạng xe và giấy tờ trước khi thanh toán</li>
+                      <li>Xuất trình CMND/CCCD hợp lệ khi nhận xe</li>
+                      <li>Đối chiếu số khung, số máy với giấy tờ đăng ký</li>
+                      <li>Giữ lại biên lai/hóa đơn để đối soát khi cần</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
               {/* Loan Calculator Toggle */}
               <button
                 type="button"
@@ -403,13 +440,23 @@ const DatMuaXe: React.FC = () => {
                 <Calculator className="w-5 h-5" />
                 <span>{showLoanCalculator ? 'Ẩn' : 'Xem'} gói vay ngân hàng</span>
               </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? 'Đang xử lý...' : 'Xác nhận đặt mua'}
-              </button>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="btn-secondary flex-1"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2 inline" />
+                  Quay lại
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Đang xử lý...' : `Xác nhận đặt mua • ${formatPrice(fees.total)}`}
+                </button>
+              </div>
             </motion.div>
 
             {/* Loan Calculator Section */}

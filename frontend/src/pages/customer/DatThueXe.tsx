@@ -28,6 +28,8 @@ const DatThueXe: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoice, setInvoice] = useState<any>(null);
+  const [showNapTienModal, setShowNapTienModal] = useState(false);
+  const [wallet, setWallet] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     ngayBatDau: '',
@@ -44,6 +46,23 @@ const DatThueXe: React.FC = () => {
     }
     fetchXeDetail();
   }, [id, user]);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const { default: walletService } = await import('../../services/walletService');
+        const response = await walletService.getMyWallet();
+        if (response.success) {
+          setWallet(response.data.wallet);
+        }
+      } catch (error) {
+        console.error('Error fetching wallet:', error);
+      }
+    };
+    if (user) {
+      fetchWallet();
+    }
+  }, [user]);
 
   const fetchXeDetail = async () => {
     try {
@@ -105,6 +124,12 @@ const DatThueXe: React.FC = () => {
     const soNgay = calculateSoNgay();
     if (soNgay <= 0) {
       alert('Ngày kết thúc phải sau ngày bắt đầu');
+      return;
+    }
+
+    const tongTienThanhToan = calculateTongTienThanhToan();
+    if (!wallet || wallet.soDuKhaDung < tongTienThanhToan) {
+      setShowNapTienModal(true);
       return;
     }
 
@@ -456,6 +481,62 @@ const DatThueXe: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Số Dư Không Đủ */}
+      {showNapTienModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl p-6 max-w-md w-full"
+          >
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Số dư không đủ!</h3>
+              <p className="text-gray-600 mb-4">
+                Bạn cần nạp thêm tiền vào ví để thanh toán đơn thuê xe
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-600">Số dư hiện tại:</span>
+                <span className="font-semibold text-gray-800">{wallet ? formatPrice(wallet.soDuKhaDung) : '0 ₫'}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-600">Số tiền cần thanh toán:</span>
+                <span className="font-semibold text-orange-600">{formatPrice(calculateTongTienThanhToan())}</span>
+              </div>
+              <div className="border-t border-amber-300 my-2"></div>
+              <div className="flex justify-between">
+                <span className="text-sm font-semibold text-gray-700">Cần nạp thêm:</span>
+                <span className="font-bold text-red-600">
+                  {formatPrice(Math.max(0, calculateTongTienThanhToan() - (wallet?.soDuKhaDung || 0)))}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowNapTienModal(false)}
+                className="flex-1 btn-secondary"
+              >
+                Hủy
+              </button>
+              <Link
+                to="/customer/vi"
+                className="flex-1 btn-primary text-center"
+              >
+                Nạp tiền ngay
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Modal Hóa Đơn */}
       {showInvoice && invoice && (
