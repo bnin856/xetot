@@ -1,11 +1,11 @@
 import React from 'react';
-import AdminLayoutSimple from '../../components/Layout/AdminLayoutSimple';
+import AdminLayout from '../../components/Layout/AdminLayout';
 
 const TongQuan: React.FC = () => {
   console.log('TongQuan component rendering...');
   
   return (
-    <AdminLayoutSimple>
+    <AdminLayout>
       <div style={{ padding: '24px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '24px' }}>
           Trang quản trị hệ thống
@@ -126,7 +126,7 @@ const TongQuan: React.FC = () => {
           </ul>
         </div>
       </div>
-    </AdminLayoutSimple>
+    </AdminLayout>
   );
 };
 
