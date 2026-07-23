@@ -10,16 +10,20 @@ import {
   MapPin,
   Phone,
   MessageSquare,
+  MessageCircle,
   Heart,
+  Share2,
   Shield,
   CheckCircle,
   ArrowLeft,
+  ShoppingCart,
+  X,
 } from 'lucide-react';
 import MainLayout from '../../components/Layout/MainLayout';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import xeChoThueService from '../../services/xeChoThueService';
-import ChatButton from '../../components/Chat/ChatButton';
+import ChatModal from '../../components/Chat/ChatModal';
 import DatLichModal from '../../components/LichXemXe/DatLichModal';
 
 interface XeChoThue {
@@ -53,6 +57,8 @@ const ChiTietXeChoThue: React.FC = () => {
   const [xe, setXe] = useState<XeChoThue | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDatLichModal, setShowDatLichModal] = useState(false);
+  const [showDatThueModal, setShowDatThueModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [yeuthich, setYeuThich] = useState(false);
 
@@ -103,19 +109,25 @@ const ChiTietXeChoThue: React.FC = () => {
     }
   };
 
-  const handleThueXe = () => {
+  const handleShare = () => {
     if (!user) {
       navigate('/dang-nhap');
       return;
     }
-    navigate(`/dat-thue-xe/${id}`);
+
+    navigator.clipboard.writeText(window.location.href);
+    alert('Đã sao chép link vào clipboard!');
   };
 
   if (loading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600"></div>
+        <div className="page-container py-8">
+          <div className="container-custom">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+            </div>
+          </div>
         </div>
       </MainLayout>
     );
@@ -147,8 +159,8 @@ const ChiTietXeChoThue: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="bg-gradient-to-br from-primary-50 to-white">
-        <div className="container-custom py-8">
+      <div className="page-container py-8">
+        <div className="container-custom">
           {/* Breadcrumb */}
           <nav className="flex items-center space-x-2 text-sm mb-6">
             <Link to="/" className="text-gray-600 hover:text-primary-600">
@@ -186,16 +198,25 @@ const ChiTietXeChoThue: React.FC = () => {
                       {trangThaiText[xe.trangThai].text}
                     </span>
                   </div>
-                  <button
-                    onClick={toggleYeuThich}
-                    className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-all shadow-lg"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        yeuthich ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                      }`}
-                    />
-                  </button>
+                  <div className="absolute top-4 right-4 flex items-center space-x-2">
+                    <button
+                      onClick={handleShare}
+                      className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-all shadow-lg"
+                      title={user ? 'Chia sẻ' : 'Đăng nhập để chia sẻ'}
+                    >
+                      <Share2 className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={toggleYeuThich}
+                      className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-all shadow-lg"
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${
+                          yeuthich ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Thumbnail Gallery */}
@@ -334,7 +355,13 @@ const ChiTietXeChoThue: React.FC = () => {
                 ) : (
                 <div className="space-y-3">
                   <button
-                    onClick={handleThueXe}
+                    onClick={() => {
+                      if (!user) {
+                        navigate('/dang-nhap');
+                        return;
+                      }
+                      setShowDatThueModal(true);
+                    }}
                     disabled={xe.trangThai !== 'sanSang'}
                     className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -349,32 +376,40 @@ const ChiTietXeChoThue: React.FC = () => {
                       <Phone className="w-4 h-4" />
                       <span>Gọi điện</span>
                     </button>
-                    {xe?.idChuXe && (
-                      <ChatButton
-                        idXe={xe._id}
-                        tenXe={xe.tenXe}
-                        idNguoiBan={typeof xe.idChuXe === 'string' ? xe.idChuXe : xe.idChuXe._id}
-                        loaiXe="xeChoThue"
-                      />
-                    )}
-                    {xe?.idChuXe && (
+                    {xe.idChuXe && (
                       <button
                         onClick={() => {
                           if (!user) {
-                            alert('Vui lòng đăng nhập để đặt lịch xem xe');
+                            alert('Vui lòng đăng nhập để chat với người cho thuê');
                             navigate('/dang-nhap');
                             return;
                           }
-                          // Mở modal đặt lịch ngay tại trang này
-                          setShowDatLichModal(true);
+                          setShowChatModal(true);
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                       >
-                        <Calendar className="w-5 h-5" />
-                        Đặt lịch xem xe
+                        <MessageCircle className="w-5 h-5" />
+                        Chat
                       </button>
                     )}
                   </div>
+
+                  {xe.idChuXe && (
+                    <button
+                      onClick={() => {
+                        if (!user) {
+                          alert('Vui lòng đăng nhập để đặt lịch xem xe');
+                          navigate('/dang-nhap');
+                          return;
+                        }
+                        setShowDatLichModal(true);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    >
+                      <Calendar className="w-5 h-5" />
+                      Đặt lịch xem xe
+                    </button>
+                  )}
                 </div>
                 )}
 
@@ -426,6 +461,113 @@ const ChiTietXeChoThue: React.FC = () => {
           idXe={xe._id}
           tenXe={xe.tenXe}
           onClose={() => setShowDatLichModal(false)}
+        />
+      )}
+
+      {/* Dat Thue Modal - Chọn cách liên hệ */}
+      <AnimatePresence>
+        {showDatThueModal && xe && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowDatThueModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-2xl flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">Bạn muốn làm gì?</h2>
+                  <p className="text-primary-100 text-sm">{xe.tenXe}</p>
+                </div>
+                <button
+                  onClick={() => setShowDatThueModal(false)}
+                  className="p-2 hover:bg-primary-700 rounded-lg transition"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Options */}
+              <div className="p-6 space-y-3">
+                {/* Nhắn tin */}
+                <button
+                  onClick={() => {
+                    if (!xe.idChuXe) {
+                      alert('Không tìm thấy thông tin người cho thuê');
+                      return;
+                    }
+                    setShowDatThueModal(false);
+                    setShowChatModal(true);
+                  }}
+                  className="w-full flex items-center gap-4 p-4 border-2 border-green-200 rounded-lg hover:bg-green-50 hover:border-green-400 transition-all group"
+                >
+                  <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition">
+                    <MessageSquare className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-semibold text-gray-800">Nhắn tin với người cho thuê</h3>
+                    <p className="text-sm text-gray-600">Trao đổi trực tiếp về xe</p>
+                  </div>
+                </button>
+
+                {/* Đặt lịch xem xe */}
+                <button
+                  onClick={() => {
+                    if (!xe.idChuXe) {
+                      alert('Không tìm thấy thông tin người cho thuê');
+                      return;
+                    }
+                    setShowDatThueModal(false);
+                    setShowDatLichModal(true);
+                  }}
+                  className="w-full flex items-center gap-4 p-4 border-2 border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition-all group"
+                >
+                  <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition">
+                    <Calendar className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-semibold text-gray-800">Đặt lịch xem xe</h3>
+                    <p className="text-sm text-gray-600">Hẹn gặp để xem xe trực tiếp</p>
+                  </div>
+                </button>
+
+                {/* Đặt thuê ngay */}
+                <button
+                  onClick={() => {
+                    setShowDatThueModal(false);
+                    navigate(`/dat-thue-xe/${id}`);
+                  }}
+                  className="w-full flex items-center gap-4 p-4 border-2 border-primary-200 rounded-lg hover:bg-primary-50 hover:border-primary-400 transition-all group"
+                >
+                  <div className="p-3 bg-primary-100 rounded-lg group-hover:bg-primary-200 transition">
+                    <ShoppingCart className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-semibold text-gray-800">Đặt thuê ngay</h3>
+                    <p className="text-sm text-gray-600">Tiến hành đặt thuê xe</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Modal - Trigger từ nút Chat hoặc modal đặt thuê */}
+      {showChatModal && xe && xe.idChuXe && (
+        <ChatModal
+          idXe={xe._id}
+          tenXe={xe.tenXe}
+          loaiXe="xeChoThue"
+          onClose={() => setShowChatModal(false)}
         />
       )}
     </MainLayout>

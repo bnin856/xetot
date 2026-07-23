@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Heart, Share2, Phone, MessageCircle, Calendar, MapPin, ShoppingCart, X } from 'lucide-react';
+import { Heart, Share2, Phone, MessageCircle, Calendar, MapPin, ShoppingCart, X, Car, Users, Gauge, Palette, Sparkles, ArrowLeft } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import MainLayout from '../../components/Layout/MainLayout';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { xeService } from '../../services/xeService';
 import { Xe } from '../../types';
-import ChatButton from '../../components/Chat/ChatButton';
 import ChatModal from '../../components/Chat/ChatModal';
 import DatLichModal from '../../components/LichXemXe/DatLichModal';
 import { getImageUrl } from '../../utils/image';
@@ -104,11 +103,13 @@ const ChiTietXe: React.FC = () => {
   if (!xe) {
     return (
       <MainLayout>
-        <div className="page-container py-8">
-          <div className="container-custom">
-            <div className="text-center py-12 text-gray-600">
-              <p>Không tìm thấy xe</p>
-            </div>
+        <div className="container-custom py-12">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Không tìm thấy xe</h2>
+            <Link to="/tim-kiem" className="btn-primary inline-flex items-center">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Quay lại danh sách
+            </Link>
           </div>
         </div>
       </MainLayout>
@@ -116,20 +117,31 @@ const ChiTietXe: React.FC = () => {
   }
 
   const idChuXeStr = typeof xe.idChuXe === 'string' ? xe.idChuXe : xe.idChuXe?._id;
+  const tenChuXe = typeof xe.idChuXe === 'string' ? undefined : xe.idChuXe?.ten;
   const laChuXe = !!user && !!idChuXeStr && idChuXeStr === user.id;
+
+  const trangThaiText: Record<Xe['trangThai'], { text: string; color: string }> = {
+    dangBan: { text: 'Đang bán', color: 'text-green-600 bg-green-100' },
+    daBan: { text: 'Đã bán', color: 'text-gray-600 bg-gray-100' },
+    dangCho: { text: 'Chờ duyệt', color: 'text-yellow-600 bg-yellow-100' },
+  };
 
   return (
     <MainLayout>
       <div className="page-container py-8">
         <div className="container-custom">
           {/* Breadcrumb */}
-          <div className="mb-6 text-sm text-gray-600">
-            <Link to="/" className="hover:text-primary-600">Trang chủ</Link>
-            <span className="mx-2">/</span>
-            <Link to="/tim-kiem" className="hover:text-primary-600">Tìm kiếm</Link>
-            <span className="mx-2">/</span>
-            <span>Chi tiết xe</span>
-          </div>
+          <nav className="flex items-center space-x-2 text-sm mb-6">
+            <Link to="/" className="text-gray-600 hover:text-primary-600">
+              Trang chủ
+            </Link>
+            <span className="text-gray-400">/</span>
+            <Link to="/tim-kiem" className="text-gray-600 hover:text-primary-600">
+              Tìm kiếm
+            </Link>
+            <span className="text-gray-400">/</span>
+            <span className="text-primary-600 font-medium">{xe.tenXe}</span>
+          </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Image */}
@@ -137,32 +149,41 @@ const ChiTietXe: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="card p-4 mb-4"
+                className="card overflow-hidden mb-4"
               >
-                <div className="h-96 bg-gray-200 rounded-lg mb-4 relative">
+                <div className="relative aspect-video bg-gray-100">
                   {xe.hinhAnh && xe.hinhAnh.length > 0 ? (
                     <img
                       src={getImageUrl(xe.hinhAnh[hinhAnhChon])}
                       alt={xe.tenXe}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 rounded-lg">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
                       Chưa có ảnh
                     </div>
                   )}
-                  <div className="absolute top-4 left-4 bg-primary-600 text-white px-4 py-2 rounded-full font-medium">
-                    {xe.trangThai === 'dangBan' ? 'Đang bán' : 'Đã bán'}
+                  <div className="absolute top-4 left-4">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${trangThaiText[xe.trangThai].color}`}>
+                      {trangThaiText[xe.trangThai].text}
+                    </span>
                   </div>
+                  <button
+                    onClick={handleToggleFavorite}
+                    className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-all shadow-lg"
+                    title={user ? (yeuThich ? 'Bỏ yêu thích' : 'Thêm vào yêu thích') : 'Đăng nhập để yêu thích'}
+                  >
+                    <Heart className={`w-5 h-5 ${yeuThich ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                  </button>
                 </div>
                 {xe.hinhAnh && xe.hinhAnh.length > 1 && (
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="flex space-x-2 p-4 overflow-x-auto">
                     {xe.hinhAnh.map((img, idx) => (
                       <button
                         key={idx}
                         onClick={() => setHinhAnhChon(idx)}
-                        className={`h-20 bg-gray-200 rounded-lg overflow-hidden ${
-                          hinhAnhChon === idx ? 'ring-2 ring-primary-600' : ''
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          hinhAnhChon === idx ? 'border-primary-600' : 'border-gray-200 hover:border-primary-300'
                         }`}
                       >
                         <img
@@ -196,43 +217,104 @@ const ChiTietXe: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="border-t pt-6">
-                  <h2 className="text-xl font-semibold mb-4">Mô tả</h2>
-                  <p className="text-gray-600 leading-relaxed">{xe.moTa}</p>
-                </div>
+              </motion.div>
 
-                <div className="border-t pt-6 mt-6">
-                  <h2 className="text-xl font-semibold mb-4">Thông số kỹ thuật</h2>
-                  <div className="grid grid-cols-2 gap-4">
+              {/* Thông số kỹ thuật */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="card p-6 mt-6"
+              >
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Thông số kỹ thuật</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Car className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Hãng:</span>
-                      <span className="ml-2 font-medium">{xe.hangXe}</span>
+                      <p className="text-xs text-gray-600">Hãng xe</p>
+                      <p className="font-semibold text-gray-800">{xe.hangXe}</p>
                     </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Số chỗ:</span>
-                      <span className="ml-2 font-medium">{xe.soCho} chỗ</span>
+                      <p className="text-xs text-gray-600">Năm SX</p>
+                      <p className="font-semibold text-gray-800">{xe.namSanXuat}</p>
                     </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Users className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Màu sắc:</span>
-                      <span className="ml-2 font-medium">{xe.mauSac}</span>
+                      <p className="text-xs text-gray-600">Số chỗ</p>
+                      <p className="font-semibold text-gray-800">{xe.soCho} chỗ</p>
                     </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Gauge className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Số km:</span>
-                      <span className="ml-2 font-medium">{new Intl.NumberFormat('vi-VN').format(xe.soKm)} km</span>
+                      <p className="text-xs text-gray-600">Số km</p>
+                      <p className="font-semibold text-gray-800">{new Intl.NumberFormat('vi-VN').format(xe.soKm)} km</p>
                     </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Palette className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Loại xe:</span>
-                      <span className="ml-2 font-medium">{xe.loaiXe}</span>
+                      <p className="text-xs text-gray-600">Màu sắc</p>
+                      <p className="font-semibold text-gray-800">{xe.mauSac}</p>
                     </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Car className="w-5 h-5 text-primary-600" />
                     <div>
-                      <span className="text-gray-600">Tình trạng:</span>
-                      <span className={`ml-2 font-bold ${xe.tinhTrangXe === 'xeMoi' ? 'text-green-600' : 'text-gray-700'}`}>
-                        {xe.tinhTrangXe === 'xeMoi' ? '🆕 Xe mới' : 'Xe cũ'}
-                      </span>
+                      <p className="text-xs text-gray-600">Loại xe</p>
+                      <p className="font-semibold text-gray-800">{xe.loaiXe}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Sparkles className="w-5 h-5 text-primary-600" />
+                    <div>
+                      <p className="text-xs text-gray-600">Tình trạng</p>
+                      <p className={`font-semibold ${xe.tinhTrangXe === 'xeMoi' ? 'text-green-600' : 'text-gray-800'}`}>
+                        {xe.tinhTrangXe === 'xeMoi' ? 'Xe mới' : 'Xe cũ'}
+                      </p>
                     </div>
                   </div>
                 </div>
               </motion.div>
+
+              {/* Mô tả */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="card p-6 mt-6"
+              >
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Mô tả</h2>
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line">{xe.moTa}</p>
+              </motion.div>
+
+              {/* Thông tin người bán */}
+              {tenChuXe && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="card p-6 mt-6"
+                >
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Thông tin người bán</h2>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
+                      <span className="text-2xl font-bold text-primary-600">
+                        {tenChuXe.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 text-lg">{tenChuXe}</p>
+                      <p className="text-sm text-gray-600">Đã đăng từ: {new Date(xe.ngayDang).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -243,22 +325,14 @@ const ChiTietXe: React.FC = () => {
                 className="card p-6 sticky top-24"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex justify-end">
                     <button
-                      onClick={handleToggleFavorite}
-                      className={`p-3 rounded-lg ${
-                        yeuThich ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
-                      } hover:bg-red-100 hover:text-red-600 transition-colors`}
-                      title={user ? (yeuThich ? 'Bỏ yêu thích' : 'Thêm vào yêu thích') : 'Đăng nhập để yêu thích'}
-                    >
-                      <Heart className={`w-5 h-5 ${yeuThich ? 'fill-current' : ''}`} />
-                    </button>
-                    <button 
                       onClick={handleShare}
-                      className="p-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-1 text-sm text-gray-600 hover:text-primary-600 transition-colors"
                       title={user ? 'Chia sẻ' : 'Đăng nhập để chia sẻ'}
                     >
-                      <Share2 className="w-5 h-5" />
+                      <Share2 className="w-4 h-4" />
+                      <span>Chia sẻ</span>
                     </button>
                   </div>
 
@@ -268,9 +342,24 @@ const ChiTietXe: React.FC = () => {
                       <p className="text-xs text-blue-600 mt-1">Bạn không thể mua hoặc đặt lịch xem xe do chính mình đăng bán</p>
                     </div>
                   ) : (
-                    <>
-                      <div className="border-t pt-4">
-                        <p className="text-sm text-gray-600 mb-2">Liên hệ người bán</p>
+                    <div className="space-y-3">
+                      {user ? (
+                        <button
+                          onClick={() => setShowDatMuaModal(true)}
+                          className="block w-full btn-primary text-center"
+                        >
+                          Đặt mua ngay
+                        </button>
+                      ) : (
+                        <Link
+                          to="/dang-nhap"
+                          className="block w-full btn-primary text-center"
+                        >
+                          Đăng nhập để đặt mua
+                        </Link>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-3">
                         <button
                           onClick={() => {
                             if (!user) {
@@ -279,16 +368,12 @@ const ChiTietXe: React.FC = () => {
                               alert('Số điện thoại: 093 355 1234');
                             }
                           }}
-                          className="w-full btn-primary mb-2 flex items-center justify-center space-x-2"
+                          className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-all font-medium"
                         >
-                          <Phone className="w-5 h-5" />
-                          <span>{user ? '093 355 1234' : 'Xem số điện thoại'}</span>
+                          <Phone className="w-4 h-4" />
+                          <span>{user ? '093 355 1234' : 'Gọi điện'}</span>
                         </button>
-                      </div>
-
-                      {/* Chat Button */}
-                      {xe.idChuXe && (
-                        <div className="mb-3">
+                        {xe.idChuXe && (
                           <button
                             onClick={() => {
                               if (!user) {
@@ -301,14 +386,14 @@ const ChiTietXe: React.FC = () => {
                             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                           >
                             <MessageCircle className="w-5 h-5" />
-                            Chat với người bán
+                            Chat
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
 
                       {/* Đặt lịch Button */}
                       {xe.idChuXe && (
-                        <div className="mb-3">
+                        <div>
                           <button
                             onClick={() => {
                               if (!user) {
@@ -326,23 +411,7 @@ const ChiTietXe: React.FC = () => {
                           </button>
                         </div>
                       )}
-
-                      {user ? (
-                        <button
-                          onClick={() => setShowDatMuaModal(true)}
-                          className="block w-full btn-primary text-center"
-                        >
-                          Đặt mua ngay
-                        </button>
-                      ) : (
-                        <Link
-                          to="/dang-nhap"
-                          className="block w-full btn-primary text-center"
-                        >
-                          Đăng nhập để đặt mua
-                        </Link>
-                      )}
-                    </>
+                    </div>
                   )}
 
                   <div className="border-t pt-4 text-sm text-gray-600">
