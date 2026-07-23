@@ -75,8 +75,11 @@ src/
 - Quản lý thanh toán
 - Và nhiều tính năng khác...
 
+### Người bán / Cho thuê / Dịch vụ
+- Dashboard riêng theo vai trò (`/seller`, `/rental`, `/service`)
+- Quản lý tin đăng, xác nhận/từ chối đơn hàng, xem doanh thu và lịch sử giao dịch
+
 ## Ghi chú
 
-- Backend API sẽ được tích hợp sau
-- Hiện tại sử dụng mock data
-- Cần cấu hình API endpoint trong `src/services/` khi backend sẵn sàng
+- Xem hướng dẫn cài đặt và chạy đầy đủ (cả backend) tại [README.md ở thư mục gốc](../README.md)
+- Trong development, API được gọi qua Vite proxy (xem `vite.config.ts`) nên không cần cấu hình `VITE_API_URL`
