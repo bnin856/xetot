@@ -6,7 +6,6 @@ import {
   FileText, LogOut, Menu, X, Shield
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { motion } from 'framer-motion';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -58,10 +57,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{ x: sidebarOpen ? 0 : -300 }}
-        className="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:shadow-none lg:translate-x-0"
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:shadow-none transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b lg:hidden">
           <div className="text-xl font-bold text-primary-600">Xe Tốt Admin</div>
@@ -101,7 +100,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <span>Đăng xuất</span>
           </button>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Main Content */}
       <div className="lg:ml-64">
