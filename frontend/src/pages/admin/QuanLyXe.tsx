@@ -228,7 +228,7 @@ const QuanLyXe: React.FC = () => {
       formDataToSend.append('soKm', formData.soKm);
       formDataToSend.append('soCho', formData.soCho.toString());
       formDataToSend.append('loaiXe', formData.loaiXe);
-      formDataToSend.append('tinhTrangXe', formData.tinhTrangXe);
+      formDataToSend.append('tinhTrangXe', Number(formData.soKm) > 0 ? 'xeCu' : 'xeMoi');
       formDataToSend.append('trangThai', formData.trangThai);
       formDataToSend.append('moTa', formData.moTa);
     } else {
@@ -579,12 +579,11 @@ const QuanLyXe: React.FC = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2">Tình trạng *</label>
-                        <select className="input-field" value={formData.tinhTrangXe}
-                          onChange={(e) => setFormData({ ...formData, tinhTrangXe: e.target.value as 'xeMoi' | 'xeCu' })} required>
-                          <option value="xeMoi">Xe mới</option>
-                          <option value="xeCu">Xe cũ</option>
-                        </select>
+                        <label className="block text-sm font-medium mb-2">Tình trạng</label>
+                        <div className="input-field bg-gray-50 text-gray-700">
+                          {Number(formData.soKm) > 0 ? 'Xe cũ' : 'Xe mới (0 km)'}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Tự động xác định theo số km</p>
                       </div>
                     </div>
                     <div>

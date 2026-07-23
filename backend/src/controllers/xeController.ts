@@ -4,6 +4,7 @@ import User from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { toWebPath } from '../middleware/upload';
+import { tinhTrangXeTuSoKm } from '../utils/tinhTrangXe';
 
 export const getAllXe = async (
   req: Request,
@@ -139,6 +140,7 @@ export const createXe = async (
       ...req.body,
       hinhAnh,
       idChuXe: userId, // Lưu ID chủ xe
+      tinhTrangXe: tinhTrangXeTuSoKm(Number(req.body.soKm)),
     });
 
     // Gắn vai trò "người bán" để mở khóa Dashboard Bán Xe
@@ -177,6 +179,10 @@ export const updateXe = async (
 
     if (req.files && (req.files as Express.Multer.File[]).length > 0) {
       updateData.hinhAnh = (req.files as Express.Multer.File[]).map((file) => toWebPath(file.path));
+    }
+
+    if (updateData.soKm !== undefined) {
+      updateData.tinhTrangXe = tinhTrangXeTuSoKm(Number(updateData.soKm));
     }
 
     const xe: any = await Xe.findByIdAndUpdate(req.params.id, updateData, {

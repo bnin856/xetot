@@ -112,6 +112,14 @@ Upload ảnh xe sử dụng multipart/form-data với field name `hinhAnh` (có 
 
 Khi đã cấu hình biến môi trường `CLOUDINARY_*`, file được đẩy thẳng lên Cloudinary (không lưu đĩa) và các model lưu URL Cloudinary trực tiếp. Nếu chưa cấu hình, hệ thống fallback lưu vào thư mục `uploads/` cục bộ như trước - **không dùng cách này cho production trên Render** vì filesystem ở đó là ephemeral (mất dữ liệu mỗi lần container redeploy/restart/sleep).
 
+## Quy tắc nghiệp vụ: Tình trạng xe (mới/cũ)
+
+`tinhTrangXe` của xe bán (`Xe.tinhTrangXe`) **không phải trường nhập tay** - backend luôn tự tính lại từ `soKm` mỗi khi tạo/sửa xe (xem `src/utils/tinhTrangXe.ts`), ghi đè bất kỳ giá trị nào client gửi lên:
+- `soKm = 0` → `xeMoi` (xe mới)
+- `soKm > 0` → `xeCu` (xe cũ, đã qua sử dụng)
+
+Áp dụng cho cả 3 đường tạo/sửa xe: `POST /api/v1/xe`, `PUT /api/v1/xe/:id`, và `PUT /api/v1/yeu-cau-ban-xe/:id/duyet`. Xe cho thuê (`XeChoThue`) không có khái niệm mới/cũ nên không áp dụng quy tắc này.
+
 ## Cấu trúc thư mục
 
 ```

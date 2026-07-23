@@ -5,6 +5,7 @@ import Xe from '../models/Xe';
 import { createError } from '../middleware/errorHandler';
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
+import { tinhTrangXeTuSoKm } from '../utils/tinhTrangXe';
 
 const router = express.Router();
 
@@ -76,6 +77,7 @@ router.put('/:id/duyet', authenticate, requireAdmin, async (req: Request, res: R
       gia: yeuCau.giaYeuCau,
       soCho: 5, // Default
       loaiXe: 'sedan', // Default
+      tinhTrangXe: tinhTrangXeTuSoKm(yeuCau.soKm),
       trangThai: 'dangBan',
       moTa: yeuCau.moTa || '',
       hinhAnh: [],

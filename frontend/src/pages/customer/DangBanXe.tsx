@@ -21,7 +21,6 @@ const DangBanXe: React.FC = () => {
     soKm: '',
     soCho: 4,
     loaiXe: '',
-    tinhTrangXe: 'xeCu' as 'xeMoi' | 'xeCu',
     moTa: '',
   });
 
@@ -101,7 +100,7 @@ const DangBanXe: React.FC = () => {
       submitData.append('soKm', formData.soKm);
       submitData.append('soCho', formData.soCho.toString());
       submitData.append('loaiXe', formData.loaiXe);
-      submitData.append('tinhTrangXe', formData.tinhTrangXe);
+      submitData.append('tinhTrangXe', Number(formData.soKm) > 0 ? 'xeCu' : 'xeMoi');
       submitData.append('moTa', formData.moTa);
       submitData.append('trangThai', 'dangBan');
 
@@ -331,18 +330,12 @@ const DangBanXe: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tình trạng xe <span className="text-red-500">*</span>
+                      Tình trạng xe
                     </label>
-                    <select
-                      name="tinhTrangXe"
-                      value={formData.tinhTrangXe}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                      required
-                    >
-                      <option value="xeCu">Xe cũ (đã qua sử dụng)</option>
-                      <option value="xeMoi">Xe mới (chưa qua sử dụng)</option>
-                    </select>
+                    <div className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-700">
+                      {Number(formData.soKm) > 0 ? 'Xe cũ (đã qua sử dụng)' : 'Xe mới (0 km)'}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Tự động xác định theo số km đã chạy</p>
                   </div>
                 </div>
 
